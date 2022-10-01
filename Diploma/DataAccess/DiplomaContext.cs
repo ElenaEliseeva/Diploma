@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Diploma.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Diploma.Models
+namespace Diploma.DataAccess
 {
     public partial class DiplomaContext : DbContext
     {
