@@ -2,16 +2,15 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Diploma.DataAccess;
-using Microsoft.EntityFrameworkCore;
 
 namespace Diploma.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly DiplomaContext _dbContext;
+        private readonly QuizDbContext _dbContext;
 
-        public HomeController(ILogger<HomeController> logger, DiplomaContext dbContext)
+        public HomeController(ILogger<HomeController> logger, QuizDbContext dbContext)
         {
             _logger = logger;
             _dbContext = dbContext;

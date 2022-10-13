@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Diploma.Models
+﻿namespace Diploma.Models
 {
     public partial class ModalType
     {

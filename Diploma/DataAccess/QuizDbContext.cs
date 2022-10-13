@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using Diploma.Models;
+﻿using Diploma.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Diploma.DataAccess
 {
-    public partial class DiplomaContext : DbContext
+    public partial class QuizDbContext : DbContext
     {
-        public DiplomaContext()
-        {
-        }
-
-        public DiplomaContext(DbContextOptions<DiplomaContext> options)
+        public QuizDbContext(DbContextOptions<QuizDbContext> options)
             : base(options)
         {
         }
@@ -29,11 +22,6 @@ namespace Diploma.DataAccess
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=LAPTOP-UCMB63C4\\SQL_EXPRESS;Database=Diploma;Trusted_Connection=True;");
-            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -45,7 +33,9 @@ namespace Diploma.DataAccess
                 entity.HasIndex(e => e.AnswerId, "Answer_answer_id_uindex")
                     .IsUnique();
 
-                entity.Property(e => e.AnswerId).HasColumnName("answer_id");
+                entity.Property(e => e.AnswerId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("answer_id");
 
                 entity.Property(e => e.AnswerResult).HasColumnName("answer_result");
 
@@ -110,7 +100,9 @@ namespace Diploma.DataAccess
                 entity.HasIndex(e => e.QuestionId, "Question_question_id_uindex")
                     .IsUnique();
 
-                entity.Property(e => e.QuestionId).HasColumnName("question_id");
+                entity.Property(e => e.QuestionId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("question_id");
 
                 entity.Property(e => e.QuestionNumber).HasColumnName("question_number");
 
@@ -124,7 +116,9 @@ namespace Diploma.DataAccess
                 entity.HasIndex(e => e.Id, "Question_Answer_id_uindex")
                     .IsUnique();
 
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("id");
 
                 entity.Property(e => e.AnswerId).HasColumnName("answer_id");
 
@@ -148,7 +142,9 @@ namespace Diploma.DataAccess
                 entity.HasIndex(e => e.TestId, "Test_test_id_uindex")
                     .IsUnique();
 
-                entity.Property(e => e.TestId).HasColumnName("test_id");
+                entity.Property(e => e.TestId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("test_id");
 
                 entity.Property(e => e.TestType).HasColumnName("test_type");
             });
@@ -160,7 +156,9 @@ namespace Diploma.DataAccess
                 entity.HasIndex(e => e.Id, "Test_Question_id_uindex")
                     .IsUnique();
 
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("id");
 
                 entity.Property(e => e.QuestionId).HasColumnName("question_id");
 

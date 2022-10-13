@@ -1,12 +1,11 @@
-﻿using System.Text;
-using Diploma.DataAccess;
+﻿using Diploma.DataAccess;
 
 namespace Diploma.Models;
 
 public class SeedDatabase
 {
-    private readonly DiplomaContext dbContext;
-    public SeedDatabase(DiplomaContext dbContext)
+    private readonly QuizDbContext dbContext;
+    public SeedDatabase(QuizDbContext dbContext)
     {
         this.dbContext = dbContext;
     }
