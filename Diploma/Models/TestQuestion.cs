@@ -1,4 +1,7 @@
-﻿namespace Diploma.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace Diploma.Models
 {
     public partial class TestQuestion
     {

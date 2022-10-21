@@ -18,4 +18,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DataAccess\" />
+    <Folder Include="Dto\" />
+    <Folder Include="Repository\" />
+  </ItemGroup>
+
 </Project>

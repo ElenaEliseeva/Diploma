@@ -1,37 +1,26 @@
-﻿using Diploma.Models;
+﻿using Diploma.Mapping;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using Diploma.DataAccess;
+using Diploma.Repository;
 
 namespace Diploma.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly QuizDbContext _dbContext;
+        private readonly IQuizRepository _quizRepository;
 
-        public HomeController(ILogger<HomeController> logger, QuizDbContext dbContext)
+        public HomeController(ILogger<HomeController> logger, IQuizRepository quizRepository)
         {
             _logger = logger;
-            _dbContext = dbContext;
+            _quizRepository = quizRepository;
         }
 
         public async Task<IActionResult> Index()
         {
-            var seedDatabase = new SeedDatabase(_dbContext);
-            await seedDatabase.Initialize();
-            return View();
-        }
+            var test = await _quizRepository.GetTestByType(true);
+            var testDto = test.ToDto();
 
-        public IActionResult Privacy()
-        {
             return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

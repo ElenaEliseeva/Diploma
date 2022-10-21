@@ -1,11 +1,13 @@
-﻿using Diploma.Models;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Diploma.DataAccess
+namespace Diploma.Models
 {
-    public partial class QuizDbContext : DbContext
+    public partial class DiplomDbContext : DbContext
     {
-        public QuizDbContext(DbContextOptions<QuizDbContext> options)
+        public DiplomDbContext(DbContextOptions<DiplomDbContext> options)
             : base(options)
         {
         }
@@ -40,11 +42,19 @@ namespace Diploma.DataAccess
                 entity.Property(e => e.AnswerResult).HasColumnName("answer_result");
 
                 entity.Property(e => e.AnswerText).HasColumnName("answer_text");
+
+                entity.Property(e => e.AnswerTextResult)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("answer_text_result")
+                    .IsFixedLength();
             });
 
             modelBuilder.Entity<ModalTime>(entity =>
             {
                 entity.ToTable("Modal_Time");
+
+                entity.HasIndex(e => e.UserId, "IX_Modal_Time_user_id");
 
                 entity.HasIndex(e => e.ModalTimeId, "Modal_Time_modal_time_id_uindex")
                     .IsUnique();
@@ -113,6 +123,10 @@ namespace Diploma.DataAccess
             {
                 entity.ToTable("Question_Answer");
 
+                entity.HasIndex(e => e.AnswerId, "IX_Question_Answer_answer_id");
+
+                entity.HasIndex(e => e.QuestionId, "IX_Question_Answer_question_id");
+
                 entity.HasIndex(e => e.Id, "Question_Answer_id_uindex")
                     .IsUnique();
 
@@ -153,6 +167,10 @@ namespace Diploma.DataAccess
             {
                 entity.ToTable("Test_Question");
 
+                entity.HasIndex(e => e.QuestionId, "IX_Test_Question_question_id");
+
+                entity.HasIndex(e => e.TestId, "IX_Test_Question_test_id");
+
                 entity.HasIndex(e => e.Id, "Test_Question_id_uindex")
                     .IsUnique();
 
@@ -178,6 +196,12 @@ namespace Diploma.DataAccess
             modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("User");
+
+                entity.HasIndex(e => e.ModalTypeId, "IX_User_modal_type_id");
+
+                entity.HasIndex(e => e.PersonalityId, "IX_User_personality_id");
+
+                entity.HasIndex(e => e.TestId, "IX_User_test_id");
 
                 entity.HasIndex(e => e.UserId, "User_user_id_uindex")
                     .IsUnique();
