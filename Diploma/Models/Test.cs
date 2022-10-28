@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Diploma.Dto;
-
-namespace Diploma.Models
+﻿namespace Diploma.Models
 {
     public partial class Test
     {

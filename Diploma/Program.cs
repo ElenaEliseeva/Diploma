@@ -11,6 +11,7 @@ builder.Services.AddDbContext<DiplomDbContext>(options =>
 
 builder.Services.AddScoped<IQuizRepository, QuizRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPersonalityRepository, PersonalityRepository>();
 
 var app = builder.Build();
 
@@ -23,6 +24,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Test}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

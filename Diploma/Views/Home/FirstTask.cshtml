@@ -1,0 +1,69 @@
+﻿<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<style>
+    .button-grid {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 400px;
+    }
+
+    .button-grid-keys {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 20px;
+        padding: 20px;
+    }
+</style>
+
+<form asp-action="FirstTask" asp-controller="Home" method="post">
+    <div class="button-grid">
+        <div class="button-grid-keys">
+            <button type="submit" value="1">1</button>
+            <button type="submit" value="2">2</button>
+            <button type="submit" value="3">3</button>
+
+            <button type="submit" value="4">4</button>
+            <button type="submit" value="5">5</button>
+            <button type="submit" value="6">6</button>
+
+            <button type="submit" value="7">7</button>
+            <button type="submit" value="8">8</button>
+            <button type="submit" value="9">9</button>
+        </div>
+    </div>
+</form>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Предупреждение</h5>
+                <button onclick="SaveModalResult()" name="buttonType" value="false" type="submit" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <img src="icons/warning-icon.png" alt="Warning">
+                <h5 id="exampleModalBody">Чтобы сохранить результат на следующем экране нажмите на первую кнопку в первом ряду</h5>
+            </div>
+            <div class="modal-footer">
+                <button onclick="SaveModalResult()" name="buttonType" value="false" type="submit" class="btn btn-secondary" data-bs-dismiss="modal">Остаться</button>
+                <button onclick="SaveModalResult()" name="buttonType" value="ok" type="submit" class="btn btn-primary" data-bs-dismiss="modal">Продолжить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(window).on('load', function () {
+        $('#exampleModal').modal('show');
+    });
+
+    function SaveModalResult() {
+        $.get("/Home/SaveModalResult");
+    }
+</script>
