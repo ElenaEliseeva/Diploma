@@ -20,4 +20,14 @@ public static class DomainToDtoMapping
         quizDto.QuestionDto = questionsList;
         return quizDto;
     }
+
+    public static PersonalityDto ToDto(this Personality personality)
+    {
+        return new PersonalityDto
+        {
+            PersonalityDescription = personality.PersonalityDescription,
+            PersonalityLink = personality.PersonalityLink,
+            PersonalityTitle = personality.PersonalityTitle
+        };
+    }
 }

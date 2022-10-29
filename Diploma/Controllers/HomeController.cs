@@ -3,7 +3,6 @@ using Diploma.Mapping;
 using Microsoft.AspNetCore.Mvc;
 using Diploma.Repository;
 using System.Diagnostics;
-using Diploma.Models;
 
 namespace Diploma.Controllers {
     public class HomeController : Controller {
@@ -15,6 +14,7 @@ namespace Diploma.Controllers {
         private static bool TestType;
         private static Dictionary<int, TimeSpan> ModalTimeDictionary = new Dictionary<int, TimeSpan>();
         private static int Counter;
+        private static string WordTestResult = null!;
         private static Stopwatch? timer;
 
         public HomeController(ILogger<HomeController> logger, IQuizRepository quizRepository, IPersonalityRepository personalityRepository, IUserRepository userRepository) {
@@ -42,7 +42,7 @@ namespace Diploma.Controllers {
         public IActionResult CreateTestResult([FromForm] QuizDto quizDto, int age) {
             switch (TestType) {
                 case true:
-                    var simpleTestResult = string.Join("", quizDto.QuestionDto
+                    WordTestResult = string.Join("", quizDto.QuestionDto
                         .SelectMany(x => x.Answers)
                         .Where(x => x.IsSelected)
                         .Select(x => x.AnswerTextResult));
@@ -77,10 +77,18 @@ namespace Diploma.Controllers {
             return View();
         }
 
+        public IActionResult FirstTaskSaveResult() {
+            return RedirectToAction("SecondTask");
+        }
+
         public IActionResult SecondTask() {
             timer = new Stopwatch();
             timer.Start();
             return View();
+        }
+
+        public IActionResult SecondTaskSaveResult() {
+            return RedirectToAction("ThirdTask");
         }
 
         public IActionResult ThirdTask() {
@@ -89,11 +97,15 @@ namespace Diploma.Controllers {
             return View();
         }
 
+        public IActionResult ThirdTaskSaveResult() {
+            return RedirectToAction("TestResult");
+        }
+
         public async Task<IActionResult> TestResult() {
-            var personality = await _personalityRepository.GetPersonalityByTitle("ISFP");
+            var personality = await _personalityRepository.GetPersonalityByTitle(WordTestResult);
             //var user = new User();
             //await _userRepository.Add(user);
-            return View(personality);
+            return View(personality?.ToDto());
         }
     }
 }

@@ -21,7 +21,7 @@
     }
 </style>
 
-<form asp-action="FirstTask" asp-controller="Home" method="post">
+<form asp-action="FirstTaskSaveResult" asp-controller="Home" method="post">
     <div class="button-grid">
         <div class="button-grid-keys">
             <button type="submit" value="1">1</button>
@@ -37,6 +37,10 @@
             <button type="submit" value="9">9</button>
         </div>
     </div>
+    
+    <p style="text-align: center">
+        <button type="submit" class="btn btn-primary">Далее</button>
+    </p>
 </form>
 
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel">
@@ -47,7 +51,7 @@
                 <button onclick="SaveModalResult()" name="buttonType" value="false" type="submit" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <img src="icons/warning-icon.png" alt="Warning">
+                <img src="~/icons/warning-icon.png" alt="Warning">
                 <h5 id="exampleModalBody">Чтобы сохранить результат на следующем экране нажмите на первую кнопку в первом ряду</h5>
             </div>
             <div class="modal-footer">
