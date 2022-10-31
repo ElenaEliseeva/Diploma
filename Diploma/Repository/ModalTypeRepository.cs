@@ -1,7 +1,9 @@
-﻿using Diploma.Models;
+﻿using Diploma.DataAccess;
+using Diploma.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Diploma.Repository {
+namespace Diploma.Repository
+{
     public class ModalTypeRepository : IModalTypeRepository {
 
         private readonly DiplomDbContext _dbContext;

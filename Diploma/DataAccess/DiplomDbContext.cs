@@ -1,6 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Diploma.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Diploma.Models
+namespace Diploma.DataAccess
 {
     public partial class DiplomDbContext : DbContext
     {
@@ -15,6 +19,7 @@ namespace Diploma.Models
         public virtual DbSet<Personality> Personalities { get; set; } = null!;
         public virtual DbSet<Question> Questions { get; set; } = null!;
         public virtual DbSet<QuestionAnswer> QuestionAnswers { get; set; } = null!;
+        public virtual DbSet<SecondTest> SecondTests { get; set; } = null!;
         public virtual DbSet<Test> Tests { get; set; } = null!;
         public virtual DbSet<TestQuestion> TestQuestions { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
@@ -62,7 +67,7 @@ namespace Diploma.Models
 
                 entity.Property(e => e.ModalResult).HasColumnName("modal_result");
 
-                entity.Property(e => e.ModalTime1).HasColumnName("modal_time");
+                entity.Property(e => e.ModalTimeResult).HasColumnName("modal_time_result");
 
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
@@ -144,6 +149,30 @@ namespace Diploma.Models
                     .WithMany(p => p.QuestionAnswers)
                     .HasForeignKey(d => d.QuestionId)
                     .HasConstraintName("Question_Answer_Question_question_id_fk");
+            });
+
+            modelBuilder.Entity<SecondTest>(entity =>
+            {
+                entity.HasKey(e => e.SecondTest1)
+                    .HasName("Second_Test_Result_pk");
+
+                entity.ToTable("Second_Test");
+
+                entity.HasIndex(e => e.SecondTest1, "Second_Test_Result_second_test_result_uindex")
+                    .IsUnique();
+
+                entity.Property(e => e.SecondTest1).HasColumnName("second_test");
+
+                entity.Property(e => e.SecondTestNumber).HasColumnName("second_test_number");
+
+                entity.Property(e => e.SecondTestResult).HasColumnName("second_test_result");
+
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.SecondTests)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("Second_Test_User_user_id_fk");
             });
 
             modelBuilder.Entity<Test>(entity =>

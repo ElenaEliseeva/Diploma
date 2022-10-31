@@ -1,4 +1,4 @@
-using Diploma.Models;
+using Diploma.DataAccess;
 using Diploma.Repository;
 using Diploma.Services;
 using Microsoft.EntityFrameworkCore;

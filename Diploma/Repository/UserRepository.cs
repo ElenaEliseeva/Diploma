@@ -1,11 +1,12 @@
-﻿using Diploma.Models;
+﻿using Diploma.DataAccess;
+using Diploma.Models;
 
 namespace Diploma.Repository;
 
 public class UserRepository : IUserRepository
 {
     private readonly DiplomDbContext _dbContext;
-    
+
     public UserRepository(DiplomDbContext dbContext)
     {
         _dbContext = dbContext;

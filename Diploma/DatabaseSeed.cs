@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using Diploma.Models;
+using Diploma.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
 namespace Diploma;
