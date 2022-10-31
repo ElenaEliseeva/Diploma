@@ -59,7 +59,16 @@
                 <button onclick="SaveModalResult()" name="buttonType" value="false" type="submit" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <img src="~/icons/warning-icon.png" alt="Warning">
+                @switch (ViewBag.ModalTypeId) {
+                    case 1:
+                        break;
+                    case 2:
+                        <img src="~/icons/warning-icon.png" alt="Warning">
+                        break;
+                    case 3:
+                        <img src="~/icons/figure-icon.png" alt="Warning">
+                        break;
+                }
                 <h5 id="exampleModalBody">Чтобы сохранить результат на следующем экране укажите следующий порядок фигур “Круг” - “Треугольник” - “Квадат”</h5>
             </div>
             <div class="modal-footer">
@@ -76,6 +85,6 @@
     });
 
     function SaveModalResult() {
-        $.get("/Home/SaveModalResult");
+        $.get("/Home/SaveModalResult?modalNumber=3");
     }
 </script>

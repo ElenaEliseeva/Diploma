@@ -3,26 +3,35 @@ using Diploma.Mapping;
 using Microsoft.AspNetCore.Mvc;
 using Diploma.Repository;
 using System.Diagnostics;
+using Diploma.Models;
+using Diploma.Services;
 
 namespace Diploma.Controllers {
     public class HomeController : Controller {
         private readonly ILogger<HomeController> _logger;
         private readonly IQuizRepository _quizRepository;
         private readonly IPersonalityRepository _personalityRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly IModalTypeRepository _modalTypeRepository;
+        private readonly IUserService _userService;
 
         private static bool TestType;
-        private static Dictionary<int, TimeSpan> ModalTimeDictionary = new Dictionary<int, TimeSpan>();
-        private static int Counter;
+        private static int UserAge;
+        private static ModalType? ModalType;
+        private static Test? CurrentTest;
+        private static TimeSpan FirstModalTime;
+        private static TimeSpan SecondModalTime;
+        private static TimeSpan ThirdModalTime;
         private static string WordTestResult = null!;
         private static Stopwatch? timer;
 
-        public HomeController(ILogger<HomeController> logger, IQuizRepository quizRepository, IPersonalityRepository personalityRepository, IUserRepository userRepository) {
-            Counter = 1;
+        public HomeController(ILogger<HomeController> logger, IQuizRepository quizRepository,
+            IPersonalityRepository personalityRepository, IUserService userService, IModalTypeRepository modalTypeRepository)
+        {
             _logger = logger;
             _quizRepository = quizRepository;
             _personalityRepository = personalityRepository;
-            _userRepository = userRepository;
+            _userService = userService;
+            _modalTypeRepository = modalTypeRepository;
         }
 
         public IActionResult Index() {
@@ -34,8 +43,8 @@ namespace Diploma.Controllers {
         }
 
         public async Task<IActionResult> Test() {
-            var test = await _quizRepository.GetTestByType(TestType);
-            return View(test.ToDto());
+            CurrentTest = await _quizRepository.GetTestByType(TestType);
+            return View(CurrentTest.ToDto());
         }
 
         [HttpPost]
@@ -51,39 +60,54 @@ namespace Diploma.Controllers {
                     break;
             }
 
-            //todo check for null
+            UserAge = age;
 
             return RedirectToAction("FirstTask");
         }
 
-        public IActionResult Modal() {
-            return View();
-        }
-
-        public void SaveModalResult() {
+        public void SaveModalResult(int modalNumber) {
             if (timer == null) {
                 throw new Exception();
             }
-
             timer.Stop();
-            ModalTimeDictionary[Counter++] = timer.Elapsed;
 
-            //var foo = "Time taken: " + timeTaken.ToString(@"m\:ss\.fff");
+            switch (modalNumber)
+            {
+                case 1:
+                    FirstModalTime = timer.Elapsed;
+                    break;
+                case 2:
+                    SecondModalTime = timer.Elapsed;
+                    break;
+                case 3:
+                    ThirdModalTime = timer.Elapsed;
+                    break;
+            }
         }
 
-        public IActionResult FirstTask() {
+        public async Task<IActionResult> FirstTask() {
+            var rnd = new Random();
+            var res = rnd.Next(1, 4);
+            ModalType = await _modalTypeRepository.GetModalTypeById(res);
+
+            ViewBag.ModalTypeId = ModalType.ModalTypeId;
+
             timer = new Stopwatch();
             timer.Start();
             return View();
         }
 
-        public IActionResult FirstTaskSaveResult() {
+        public IActionResult FirstTaskSaveResult()
+        {
             return RedirectToAction("SecondTask");
         }
 
         public IActionResult SecondTask() {
             timer = new Stopwatch();
             timer.Start();
+
+            ViewBag.ModalTypeId = ModalType.ModalTypeId;
+
             return View();
         }
 
@@ -94,6 +118,9 @@ namespace Diploma.Controllers {
         public IActionResult ThirdTask() {
             timer = new Stopwatch();
             timer.Start();
+
+            ViewBag.ModalTypeId = ModalType.ModalTypeId;
+
             return View();
         }
 
@@ -103,9 +130,24 @@ namespace Diploma.Controllers {
 
         public async Task<IActionResult> TestResult() {
             var personality = await _personalityRepository.GetPersonalityByTitle(WordTestResult);
-            //var user = new User();
-            //await _userRepository.Add(user);
-            return View(personality?.ToDto());
+            if (personality == null)
+            {
+                throw new ArgumentNullException();
+            }
+            var user = new User
+            {
+                Age = UserAge,
+                PersonalityId = personality.PersonalityId,
+                TestId = CurrentTest.TestId,
+                ModalTypeId = ModalType.ModalTypeId
+            };
+
+            await _userService.SaveUserResultInDb(user, new List<TimeSpan>
+            {
+                FirstModalTime, SecondModalTime, ThirdModalTime
+            });
+
+            return View(personality.ToDto());
         }
     }
 }

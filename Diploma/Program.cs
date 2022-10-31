@@ -1,5 +1,6 @@
 using Diploma.Models;
 using Diploma.Repository;
+using Diploma.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,8 @@ builder.Services.AddDbContext<DiplomDbContext>(options =>
 builder.Services.AddScoped<IQuizRepository, QuizRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPersonalityRepository, PersonalityRepository>();
+builder.Services.AddScoped<IModalTypeRepository, ModalTypeRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 
