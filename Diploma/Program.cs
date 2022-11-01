@@ -1,3 +1,4 @@
+using Diploma;
 using Diploma.DataAccess;
 using Diploma.Repository;
 using Diploma.Services;
@@ -21,12 +22,19 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+var contextOptions = new DbContextOptionsBuilder<DiplomDbContext>()
+    .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    .Options;
+
+using var context = new DiplomDbContext(contextOptions);
+DatabaseSeed.SetupTestData(context);
+
 app.UseRouting();
 
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Test}/{action=Index}/{id?}");
 
 app.Run();

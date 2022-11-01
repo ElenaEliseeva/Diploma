@@ -5,27 +5,43 @@ namespace Diploma.Services;
 
 public class UserService : IUserService
 {
-    private static int Counter;
     private readonly DiplomDbContext _dbContext;
+    private readonly ILogger<UserService> _logger;
 
-    public UserService(DiplomDbContext dbContext)
+    public UserService(DiplomDbContext dbContext, ILogger<UserService> logger)
     {
-        Counter = 1;
         _dbContext = dbContext;
+        _logger = logger;
     }
 
-    public async Task SaveUserResultInDb(User user, List<TimeSpan> modalTimes)
+    public async Task SaveUserResultInDb(User user, List<(TimeSpan, bool)> modalValues)
     {
-        await _dbContext.AddAsync(user);
-        await _dbContext.SaveChangesAsync();
+        try
+        {
+            await _dbContext.Database.BeginTransactionAsync();
 
-        //foreach (var modalTime in modalTimes)
-        //{
-        //    var modalTimeEntity = new ModalTime
-        //    {
-        //        ModalNumber = Counter++,
-        //        ModalTime1 = 
-        //    }
-        //}
+            await _dbContext.AddAsync(user);
+
+            var counter = 1;
+            foreach (var modalValue in modalValues)
+            {
+                var modalTimeEntity = new ModalTime
+                {
+                    ModalNumber = counter++,
+                    ModalTimeResult = modalValue.Item1,
+                    ModalResult = modalValue.Item2,
+                    UserId = user.UserId
+                };
+                user.ModalTimes.Add(modalTimeEntity);
+                await _dbContext.AddAsync(modalTimeEntity);
+            }
+
+            await _dbContext.SaveChangesAsync();
+            await _dbContext.Database.CommitTransactionAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("{Error}", ex.Message);
+        }
     }
 }

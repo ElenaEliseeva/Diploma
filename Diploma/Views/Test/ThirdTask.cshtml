@@ -1,0 +1,86 @@
+﻿<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<form asp-action="ThirdTaskSaveResult" asp-controller="Test" method="post">
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col">
+            <div class="card h-100">
+                <img src="~/icons/triangle.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Порядковый номер фигуры</h5>
+                </div>
+                <div class="card-footer">
+                    <input class="text-muted" type="number" min="1" max="3" value="1" />
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <img src="~/icons/square.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Порядковый номер фигуры</h5>
+                </div>
+                <div class="card-footer">
+                    <input class="text-muted" type="number" min="1" max="3" value="1" />
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <img src="~/icons/ellipse.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Порядковый номер фигуры</h5>
+                </div>
+                <div class="card-footer">
+                    <input class="text-muted" type="number" min="1" max="3" value="1" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px">
+        <p style="text-align: center">
+            <button type="submit" class="btn btn-primary">Далее</button>
+        </p>
+    </div>
+</form>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Предупреждение</h5>
+                <button onclick="SaveModalResult(false)" name="buttonType" value="false" type="submit" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @switch (ViewBag.ModalTypeId)
+                {
+                    case 1:
+                        break;
+                    case 2:
+                        <img src="~/icons/warning-icon.png" alt="Warning">
+                        break;
+                    case 3:
+                        <img src="~/icons/figure-icon.png" alt="Warning">
+                        break;
+                }
+                <h5 id="exampleModalBody">Чтобы сохранить результат на следующем экране укажите следующий порядок фигур “Круг” - “Треугольник” - “Квадат”</h5>
+            </div>
+            <div class="modal-footer">
+                <button onclick="SaveModalResult(false)" name="buttonType" value="false" type="submit" class="btn btn-secondary" data-bs-dismiss="modal">Остаться</button>
+                <button onclick="SaveModalResult(true)" name="buttonType" value="ok" type="submit" class="btn btn-primary" data-bs-dismiss="modal">Продолжить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(window).on('load', function () {
+        $('#exampleModal').modal('show');
+    });
+
+    function SaveModalResult() {
+        $.get(`/Test/SaveModalResult?modalNumber=3&modalResult=${result}`);
+    }
+</script>

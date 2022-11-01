@@ -3,14 +3,15 @@ using Diploma.Mapping;
 using Microsoft.AspNetCore.Mvc;
 using Diploma.Repository;
 using System.Diagnostics;
+using Diploma.Helpers;
 using Diploma.Models;
 using Diploma.Services;
 
 namespace Diploma.Controllers;
 
-public class HomeController : Controller
+public class TestController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
+    private readonly ILogger<TestController> _logger;
     private readonly IQuizRepository _quizRepository;
     private readonly IPersonalityRepository _personalityRepository;
     private readonly IModalTypeRepository _modalTypeRepository;
@@ -20,13 +21,20 @@ public class HomeController : Controller
     private static int UserAge;
     private static ModalType? ModalType;
     private static Test? CurrentTest;
+
+
     private static TimeSpan FirstModalTime;
     private static TimeSpan SecondModalTime;
     private static TimeSpan ThirdModalTime;
+
+    private static bool FirstModalResult;
+    private static bool SecondModalResult;
+    private static bool ThirdModalResult;
+
     private static string WordTestResult = null!;
     private static Stopwatch? timer;
 
-    public HomeController(ILogger<HomeController> logger, IQuizRepository quizRepository,
+    public TestController(ILogger<TestController> logger, IQuizRepository quizRepository,
         IPersonalityRepository personalityRepository, IUserService userService, IModalTypeRepository modalTypeRepository)
     {
         _logger = logger;
@@ -42,13 +50,18 @@ public class HomeController : Controller
         var res = rnd.Next(2);
         TestType = res != 0;
         ViewBag.TestType = TestType;
+
         return View();
     }
 
-    public async Task<IActionResult> Test()
+    public async Task<IActionResult> Create()
     {
-        TestType = false;
         CurrentTest = await _quizRepository.GetTestByType(TestType);
+
+        var rnd = new Random();
+        var res = rnd.Next(1, 4);
+        ModalType = await _modalTypeRepository.GetModalTypeById(res);
+
         return View(CurrentTest.ToDto());
     }
 
@@ -64,7 +77,7 @@ public class HomeController : Controller
                     .Select(x => x.AnswerTextResult));
                 break;
             case false:
-                WordTestResult = SolveTest(quizDto.QuestionDto
+                WordTestResult = TestResultHelper.CreateWordFromTestResults(quizDto.QuestionDto
                     .SelectMany(x => x.Answers)
                     .Where(x => x.IsSelected)
                     .Select(x => char.Parse(x.AnswerTextResult))
@@ -77,61 +90,7 @@ public class HomeController : Controller
         return RedirectToAction("FirstTask");
     }
 
-    private string SolveTest(IReadOnlyList<char> testResult)
-    {
-        var dict = new Dictionary<char, int>
-        {
-            { 'E', 0 },
-            { 'I', 0 },
-            { 'S', 0 },
-            { 'N', 0 },
-            { 'T', 0 },
-            { 'F', 0 },
-            { 'J', 0 },
-            { 'P', 0 }
-        };
-
-        for (int i = 0; i < testResult.Count; i++)
-        {
-            switch (i)
-            {
-                case 0 or 7 or 14 or 28 when testResult[i] == 'A':
-                    dict['E']++;
-                    break;
-                case 0 or 7 or 14 or 28:
-                    dict['I']++;
-                    break;
-                case 1 or 8 or 15 or 22 or 29 or 2 or 9 or 16 or 23 or 30 when testResult[i] == 'A':
-                    dict['S']++;
-                    break;
-                case 1 or 8 or 15 or 22 or 29 or 2 or 9 or 16 or 23 or 30:
-                    dict['N']++;
-                    break;
-                case 3 or 10 or 17 or 24 or 31 or 4 or 11 or 18 or 25 or 32 when testResult[i] == 'A':
-                    dict['T']++;
-                    break;
-                case 3 or 10 or 17 or 24 or 31 or 4 or 11 or 18 or 25 or 32:
-                    dict['F']++;
-                    break;
-                case 5 or 12 or 19 or 26 or 33 or 6 or 13 or 20 or 27 or 34 when testResult[i] == 'A':
-                    dict['J']++;
-                    break;
-                case 5 or 12 or 19 or 26 or 33 or 6 or 13 or 20 or 27 or 34:
-                    dict['P']++;
-                    break;
-            }
-        }
-
-        return string.Join("", new List<char>
-        {
-            dict.FirstOrDefault(x => x.Value == Math.Max(dict['E'], dict['I']) && x.Key is 'E' or 'I').Key,
-            dict.FirstOrDefault(x => x.Value == Math.Max(dict['S'], dict['N']) && x.Key is 'S' or 'N').Key,
-            dict.FirstOrDefault(x => x.Value == Math.Max(dict['T'], dict['F']) && x.Key is 'T' or 'F').Key,
-            dict.FirstOrDefault(x => x.Value == Math.Max(dict['J'], dict['P']) && x.Key is 'J' or 'P').Key
-        });
-    }
-
-    public void SaveModalResult(int modalNumber)
+    public void SaveModalResult(int modalNumber, bool modalResult)
     {
         if (timer == null)
         {
@@ -143,26 +102,26 @@ public class HomeController : Controller
         {
             case 1:
                 FirstModalTime = timer.Elapsed;
+                FirstModalResult = modalResult;
                 break;
             case 2:
                 SecondModalTime = timer.Elapsed;
+                SecondModalResult = modalResult;
                 break;
             case 3:
                 ThirdModalTime = timer.Elapsed;
+                ThirdModalResult = modalResult;
                 break;
         }
     }
 
-    public async Task<IActionResult> FirstTask()
+    public IActionResult FirstTask()
     {
-        var rnd = new Random();
-        var res = rnd.Next(1, 4);
-        ModalType = await _modalTypeRepository.GetModalTypeById(res);
+        timer = new Stopwatch();
+        timer.Start();
 
         ViewBag.ModalTypeId = ModalType.ModalTypeId;
 
-        timer = new Stopwatch();
-        timer.Start();
         return View();
     }
 
@@ -218,9 +177,11 @@ public class HomeController : Controller
             ModalTypeId = ModalType.ModalTypeId
         };
 
-        await _userService.SaveUserResultInDb(user, new List<TimeSpan>
+        await _userService.SaveUserResultInDb(user, new List<(TimeSpan, bool)>
         {
-            FirstModalTime, SecondModalTime, ThirdModalTime
+            (FirstModalTime, FirstModalResult),
+            (SecondModalTime, SecondModalResult),
+            (ThirdModalTime, ThirdModalResult)
         });
 
         return View(personality.ToDto());

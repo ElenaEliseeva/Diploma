@@ -1,0 +1,51 @@
+﻿<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+@model QuizDto
+@{
+    ViewData["Title"] = "Create";
+}
+
+<style>
+    ul {
+        list-style-type: none;
+    }
+
+</style>
+
+<form asp-action="CreateTestResult" asp-controller="Test" onsubmit="return checkFormData()" method="post">
+    <div class="text-start">
+        <h1 class="display-4">Данные о вас</h1>
+        <h3>
+            Сколько вам лет?
+        </h3>
+        <input type="number" required value="12" min="12" max="80" name="age" />
+    </div>
+
+    <h1 class="display-4">Вопросы теста личности</h1>
+
+    <div>
+        <ul>
+            @for (var i = 0; i < Model.QuestionDto.Count; i++)
+            {
+                <h6>@Model.QuestionDto[i].QuestionText</h6>
+                <li>
+                    <input type="hidden" asp-for="@Model.QuestionDto[i].Answers[0].AnswerTextResult" />
+                    <input type="checkbox" asp-for="QuestionDto[i].Answers[0].IsSelected" name="@($"group{i}[]")"/> @Model.QuestionDto[i].Answers[0].AnswerText
+                    <br />
+                    <input type="hidden" asp-for="@Model.QuestionDto[i].Answers[1].AnswerTextResult" />
+                    <input type="checkbox" asp-for="QuestionDto[i].Answers[1].IsSelected" name="@($"group{i}[]")"/> @Model.QuestionDto[i].Answers[1].AnswerText
+                </li>
+            }
+        </ul>
+    </div>
+
+    <p style="text-align: center">
+        <button type="submit" value="CreateTestResult" class="btn btn-primary">Далее</button>
+    </p>
+</form>
+
+<script type="text/javascript">
+    $('input[type="checkbox"]').on('change', function () {
+        $('input[name="' + this.name + '"]').not(this).prop('checked', false);
+    });
+</script>

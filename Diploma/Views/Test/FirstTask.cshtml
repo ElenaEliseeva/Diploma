@@ -21,26 +21,26 @@
     }
 </style>
 
-<form asp-action="FirstTaskSaveResult" asp-controller="Home" method="post">
+<form asp-action="FirstTaskSaveResult" asp-controller="Test" method="post">
     <div class="button-grid">
         <div class="button-grid-keys">
-            <button type="submit" value="1">1</button>
-            <button type="submit" value="2">2</button>
-            <button type="submit" value="3">3</button>
+            <button id="btn1" type="button" value="1">1</button>
+            <button id="btn2" type="button" value="2">2</button>
+            <button id="btn3" type="button" value="3">3</button>
 
-            <button type="submit" value="4">4</button>
-            <button type="submit" value="5">5</button>
-            <button type="submit" value="6">6</button>
+            <button id="btn4" type="button" value="4">4</button>
+            <button id="btn5" type="button" value="5">5</button>
+            <button id="btn6" type="button" value="6">6</button>
 
-            <button type="submit" value="7">7</button>
-            <button type="submit" value="8">8</button>
-            <button type="submit" value="9">9</button>
+            <button id="btn7" type="button" value="7">7</button>
+            <button id="btn8" type="button" value="8">8</button>
+            <button id="btn9" type="button" value="9">9</button>
         </div>
+        
+        <p style="text-align: center">
+            <button type="submit" class="btn btn-primary">Далее</button>
+        </p>
     </div>
-    
-    <p style="text-align: center">
-        <button type="submit" class="btn btn-primary">Далее</button>
-    </p>
 </form>
 
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel">
@@ -48,7 +48,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Предупреждение</h5>
-                <button onclick="SaveModalResult()" name="buttonType" value="false" type="submit" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button onclick="SaveModalResult(false)" name="buttonType" value="false" type="submit" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 @switch (ViewBag.ModalTypeId)
@@ -65,8 +65,8 @@
                 <h5 id="exampleModalBody">Чтобы сохранить результат на следующем экране нажмите на первую кнопку в первом ряду</h5>
             </div>
             <div class="modal-footer">
-                <button onclick="SaveModalResult()" name="buttonType" value="false" type="submit" class="btn btn-secondary" data-bs-dismiss="modal">Остаться</button>
-                <button onclick="SaveModalResult()" name="buttonType" value="ok" type="submit" class="btn btn-primary" data-bs-dismiss="modal">Продолжить</button>
+                <button onclick="SaveModalResult(false)" name="buttonType" value="false" type="submit" class="btn btn-secondary" data-bs-dismiss="modal">Остаться</button>
+                <button onclick="SaveModalResult(true)" name="buttonType" value="ok" type="submit" class="btn btn-primary" data-bs-dismiss="modal">Продолжить</button>
             </div>
         </div>
     </div>
@@ -76,8 +76,24 @@
     $(window).on('load', function () {
         $('#exampleModal').modal('show');
     });
+    
+    const btns = document.querySelectorAll('button[id^=btn]')
+    
+    btns.forEach(btn => {
 
-    function SaveModalResult() {
-        $.get("/Home/SaveModalResult?modalNumber=1");
+        btn.addEventListener('click', function onClick() {
+            if (btn.style.backgroundColor === 'salmon') {
+                btn.style.backgroundColor = 'buttonface'
+                btn.style.color = 'black';
+            } else {
+                btn.style.backgroundColor = 'salmon'
+                btn.style.color = 'white';
+            }
+        });
+    
+    });
+
+    function SaveModalResult(result) {
+        $.get(`/Test/SaveModalResult?modalNumber=1&modalResult=${result}`);
     }
 </script>
