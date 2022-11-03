@@ -22,12 +22,11 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-var contextOptions = new DbContextOptionsBuilder<DiplomDbContext>()
-    .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-    .Options;
-
-using var context = new DiplomDbContext(contextOptions);
-DatabaseSeed.SetupTestData(context);
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<DiplomDbContext>();
+    DatabaseSeed.SetupTestData(dbContext);
+}
 
 app.UseRouting();
 

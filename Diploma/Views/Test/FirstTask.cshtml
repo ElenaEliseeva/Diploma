@@ -2,6 +2,8 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
+@model FirstTaskViewModel
+
 <style>
     .button-grid {
         border: 1px solid #ccc;
@@ -21,24 +23,24 @@
     }
 </style>
 
-<form asp-action="FirstTaskSaveResult" asp-controller="Test" method="post">
+<form asp-action="FirstTaskSaveResult" asp-controller="Test">
     <div class="button-grid">
         <div class="button-grid-keys">
-            <button id="btn1" type="button" value="1">1</button>
-            <button id="btn2" type="button" value="2">2</button>
-            <button id="btn3" type="button" value="3">3</button>
-
-            <button id="btn4" type="button" value="4">4</button>
-            <button id="btn5" type="button" value="5">5</button>
-            <button id="btn6" type="button" value="6">6</button>
-
-            <button id="btn7" type="button" value="7">7</button>
-            <button id="btn8" type="button" value="8">8</button>
-            <button id="btn9" type="button" value="9">9</button>
+            <button id="btn1" type="button" value="1" >1</button>
+            <button id="btn2" type="button" value="2" >2</button>
+            <button id="btn3" type="button" value="3" >3</button>
+                                                     
+            <button id="btn4" type="button" value="4" >4</button>
+            <button id="btn5" type="button" value="5" >5</button>
+            <button id="btn6" type="button" value="6" >6</button>
+                                                     
+            <button id="btn7" type="button" value="7" >7</button>
+            <button id="btn8" type="button" value="8" >8</button>
+            <button id="btn9" type="button" value="9" >9</button>
         </div>
         
         <p style="text-align: center">
-            <button type="submit" class="btn btn-primary">Далее</button>
+            <button type="submit" onclick="SaveFirstTaskResult()" class="btn btn-primary">Далее</button>
         </p>
     </div>
 </form>
@@ -65,7 +67,6 @@
                 <h5 id="exampleModalBody">Чтобы сохранить результат на следующем экране нажмите на первую кнопку в первом ряду</h5>
             </div>
             <div class="modal-footer">
-                <button onclick="SaveModalResult(false)" name="buttonType" value="false" type="submit" class="btn btn-secondary" data-bs-dismiss="modal">Остаться</button>
                 <button onclick="SaveModalResult(true)" name="buttonType" value="ok" type="submit" class="btn btn-primary" data-bs-dismiss="modal">Продолжить</button>
             </div>
         </div>
@@ -76,24 +77,38 @@
     $(window).on('load', function () {
         $('#exampleModal').modal('show');
     });
-    
-    const btns = document.querySelectorAll('button[id^=btn]')
-    
-    btns.forEach(btn => {
 
-        btn.addEventListener('click', function onClick() {
-            if (btn.style.backgroundColor === 'salmon') {
-                btn.style.backgroundColor = 'buttonface'
-                btn.style.color = 'black';
-            } else {
-                btn.style.backgroundColor = 'salmon'
-                btn.style.color = 'white';
+    $('button[type="button"]').on('click', function () {
+
+        const btns = document.querySelectorAll('button[id^=btn]');
+
+        for (let i = 0; i < btns.length; i++) {
+            if (btns[i].style.backgroundColor === 'salmon') {
+                btns[i].style.backgroundColor = 'buttonface';
+                btns[i].style.color = 'black';
+                break;
             }
-        });
-    
+        }
+
+        if (this.style.backgroundColor === 'salmon') {
+            this.style.backgroundColor = 'buttonface';
+            this.style.color = 'black';
+        } else {
+            this.style.backgroundColor = 'salmon';
+            this.style.color = 'white';
+        }
     });
 
     function SaveModalResult(result) {
         $.get(`/Test/SaveModalResult?modalNumber=1&modalResult=${result}`);
+    }
+
+    function SaveFirstTaskResult() {
+        let btn = document.getElementById('btn1');
+        if (btn.style.backgroundColor === 'salmon') {
+            $.get('/Test/SaveTaskResult?testNumber=1&selectedAction=true');
+        } else {
+            $.get('/Test/SaveTaskResult?testNumber=1&selectedAction=false');
+        }
     }
 </script>

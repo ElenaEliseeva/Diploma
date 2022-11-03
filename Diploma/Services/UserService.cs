@@ -14,7 +14,7 @@ public class UserService : IUserService
         _logger = logger;
     }
 
-    public async Task SaveUserResultInDb(User user, List<(TimeSpan, bool)> modalValues)
+    public async Task SaveUserResultInDb(User user, Dictionary<int, (TimeSpan, bool, bool?)> modalTestResults)
     {
         try
         {
@@ -23,16 +23,26 @@ public class UserService : IUserService
             await _dbContext.AddAsync(user);
 
             var counter = 1;
-            foreach (var modalValue in modalValues)
+            foreach (var modalValue in modalTestResults)
             {
                 var modalTimeEntity = new ModalTime
                 {
-                    ModalNumber = counter++,
-                    ModalTimeResult = modalValue.Item1,
-                    ModalResult = modalValue.Item2,
+                    ModalNumber = counter,
+                    ModalTimeResult = modalValue.Value.Item1,
+                    ModalResult = modalValue.Value.Item2,
                     UserId = user.UserId
                 };
+
+                var secondTestEntity = new SecondTest
+                {
+                    UserId = user.UserId,
+                    SecondTestNumber = counter,
+                    SecondTestResult = (bool)modalValue.Value.Item3
+                };
+
+                counter++;
                 user.ModalTimes.Add(modalTimeEntity);
+                user.SecondTests.Add(secondTestEntity);
                 await _dbContext.AddAsync(modalTimeEntity);
             }
 

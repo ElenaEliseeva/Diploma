@@ -9,7 +9,6 @@
     ul {
         list-style-type: none;
     }
-
 </style>
 
 <form asp-action="CreateTestResult" asp-controller="Test" onsubmit="return checkFormData()" method="post">
@@ -30,22 +29,36 @@
                 <h6>@Model.QuestionDto[i].QuestionText</h6>
                 <li>
                     <input type="hidden" asp-for="@Model.QuestionDto[i].Answers[0].AnswerTextResult" />
-                    <input type="checkbox" asp-for="QuestionDto[i].Answers[0].IsSelected" name="@($"group{i}[]")"/> @Model.QuestionDto[i].Answers[0].AnswerText
+                    <input aria-label="@($"group{i}")" type="checkbox" asp-for="QuestionDto[i].Answers[0].IsSelected" /> @Model.QuestionDto[i].Answers[0].AnswerText
                     <br />
                     <input type="hidden" asp-for="@Model.QuestionDto[i].Answers[1].AnswerTextResult" />
-                    <input type="checkbox" asp-for="QuestionDto[i].Answers[1].IsSelected" name="@($"group{i}[]")"/> @Model.QuestionDto[i].Answers[1].AnswerText
+                    <input aria-label="@($"group{i}")" type="checkbox" asp-for="QuestionDto[i].Answers[1].IsSelected" /> @Model.QuestionDto[i].Answers[1].AnswerText
                 </li>
             }
         </ul>
     </div>
 
     <p style="text-align: center">
-        <button type="submit" value="CreateTestResult" class="btn btn-primary">Далее</button>
+        <button type="submit" class="btn btn-primary">Далее</button>
     </p>
 </form>
 
 <script type="text/javascript">
     $('input[type="checkbox"]').on('change', function () {
-        $('input[name="' + this.name + '"]').not(this).prop('checked', false);
+        var attrValue = this.getAttribute("aria-label");
+        $('input[aria-label="' + attrValue + '"]').not(this).prop('checked', false);
     });
+
+    function checkFormData() {
+        const inputs = document.querySelectorAll('input[aria-label^=group]');
+
+        for (let i = 0; i < inputs.length / 2; i++) {
+            var value = `group${i}`;
+            if (!$('input[aria-label="' + value + '"]:checked').length > 0) {
+                alert('Заполните все ответы на вопросы!');
+                return false;
+            }
+        }
+        return true;
+    }
 </script>

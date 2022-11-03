@@ -3,37 +3,37 @@
 
 <form asp-action="ThirdTaskSaveResult" asp-controller="Test" method="post">
 
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="row row-cols-1 row-cols-md-3 g-4" style="margin-top: 20px">
         <div class="col">
             <div class="card h-100">
-                <img src="~/icons/triangle.png" class="card-img-top" alt="...">
+                <img src="~/icons/triangle.png" class="card-img-top" alt="Triangle">
                 <div class="card-body">
                     <h5 class="card-title">Порядковый номер фигуры</h5>
                 </div>
                 <div class="card-footer">
-                    <input class="text-muted" type="number" min="1" max="3" value="1" />
+                    <input class="text-muted" id="firstInput" type="number" min="1" max="3" value="1" />
                 </div>
             </div>
         </div>
         <div class="col">
             <div class="card h-100">
-                <img src="~/icons/square.png" class="card-img-top" alt="...">
+                <img src="~/icons/square.png" class="card-img-top" alt="Square">
                 <div class="card-body">
                     <h5 class="card-title">Порядковый номер фигуры</h5>
                 </div>
                 <div class="card-footer">
-                    <input class="text-muted" type="number" min="1" max="3" value="1" />
+                    <input class="text-muted" id="secondInput" type="number" min="1" max="3" value="1" />
                 </div>
             </div>
         </div>
         <div class="col">
             <div class="card h-100">
-                <img src="~/icons/ellipse.png" class="card-img-top" alt="...">
+                <img src="~/icons/ellipse.png" class="card-img-top" alt="Ellipse">
                 <div class="card-body">
                     <h5 class="card-title">Порядковый номер фигуры</h5>
                 </div>
                 <div class="card-footer">
-                    <input class="text-muted" type="number" min="1" max="3" value="1" />
+                    <input class="text-muted" id="thirdInput" type="number" min="1" max="3" value="1" />
                 </div>
             </div>
         </div>
@@ -41,7 +41,7 @@
 
     <div style="margin-top: 20px">
         <p style="text-align: center">
-            <button type="submit" class="btn btn-primary">Далее</button>
+            <button type="submit" onclick="SaveThirdTaskResult()" class="btn btn-primary">Далее</button>
         </p>
     </div>
 </form>
@@ -68,7 +68,6 @@
                 <h5 id="exampleModalBody">Чтобы сохранить результат на следующем экране укажите следующий порядок фигур “Круг” - “Треугольник” - “Квадат”</h5>
             </div>
             <div class="modal-footer">
-                <button onclick="SaveModalResult(false)" name="buttonType" value="false" type="submit" class="btn btn-secondary" data-bs-dismiss="modal">Остаться</button>
                 <button onclick="SaveModalResult(true)" name="buttonType" value="ok" type="submit" class="btn btn-primary" data-bs-dismiss="modal">Продолжить</button>
             </div>
         </div>
@@ -80,7 +79,18 @@
         $('#exampleModal').modal('show');
     });
 
-    function SaveModalResult() {
+    function SaveModalResult(result) {
         $.get(`/Test/SaveModalResult?modalNumber=3&modalResult=${result}`);
+    }
+
+    function SaveThirdTaskResult() {
+        if (document.getElementById('firstInput').value === "2" &&
+            document.getElementById('secondInput').value === "3" &&
+            document.getElementById('thirdInput').value === "1") {
+            $.get('/Test/SaveTaskResult?testNumber=3&selectedAction=true');
+        }
+        else {
+            $.get('/Test/SaveTaskResult?testNumber=3&selectedAction=false');
+        }
     }
 </script>

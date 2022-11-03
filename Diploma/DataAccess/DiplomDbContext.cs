@@ -153,15 +153,12 @@ namespace Diploma.DataAccess
 
             modelBuilder.Entity<SecondTest>(entity =>
             {
-                entity.HasKey(e => e.SecondTest1)
-                    .HasName("Second_Test_Result_pk");
-
                 entity.ToTable("Second_Test");
 
-                entity.HasIndex(e => e.SecondTest1, "Second_Test_Result_second_test_result_uindex")
+                entity.HasIndex(e => e.SecondTestId, "Second_Test_Result_second_test_result_uindex")
                     .IsUnique();
 
-                entity.Property(e => e.SecondTest1).HasColumnName("second_test");
+                entity.Property(e => e.SecondTestId).HasColumnName("second_test_id");
 
                 entity.Property(e => e.SecondTestNumber).HasColumnName("second_test_number");
 

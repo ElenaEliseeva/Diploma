@@ -16,3 +16,7 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.modal {
+    text-align: center;
+} 

@@ -22,14 +22,7 @@ public class TestController : Controller
     private static ModalType? ModalType;
     private static Test? CurrentTest;
 
-
-    private static TimeSpan FirstModalTime;
-    private static TimeSpan SecondModalTime;
-    private static TimeSpan ThirdModalTime;
-
-    private static bool FirstModalResult;
-    private static bool SecondModalResult;
-    private static bool ThirdModalResult;
+    private static readonly Dictionary<int, (TimeSpan modalTime, bool modalResult, bool? testResult)> resDictionary = new();
 
     private static string WordTestResult = null!;
     private static Stopwatch? timer;
@@ -101,16 +94,13 @@ public class TestController : Controller
         switch (modalNumber)
         {
             case 1:
-                FirstModalTime = timer.Elapsed;
-                FirstModalResult = modalResult;
+                resDictionary[1] = (timer.Elapsed, modalResult, null);
                 break;
             case 2:
-                SecondModalTime = timer.Elapsed;
-                SecondModalResult = modalResult;
+                resDictionary[2] = (timer.Elapsed, modalResult, null);
                 break;
             case 3:
-                ThirdModalTime = timer.Elapsed;
-                ThirdModalResult = modalResult;
+                resDictionary[3] = (timer.Elapsed, modalResult, null);
                 break;
         }
     }
@@ -123,6 +113,13 @@ public class TestController : Controller
         ViewBag.ModalTypeId = ModalType.ModalTypeId;
 
         return View();
+    }
+
+    public void SaveTaskResult(int testNumber, bool selectedAction)
+    {
+        if (!resDictionary.TryGetValue(testNumber, out var val)) return;
+        val.testResult = selectedAction;
+        resDictionary[testNumber] = val;
     }
 
     public IActionResult FirstTaskSaveResult()
@@ -166,7 +163,8 @@ public class TestController : Controller
 
         if (personality == null)
         {
-            throw new Exception("Personality wasn't found!");
+            _logger.LogInformation("Personality was null {personality}; Word test result: {WordTestResult}", personality, WordTestResult);
+            return RedirectToAction("Index");
         }
 
         var user = new User
@@ -177,12 +175,7 @@ public class TestController : Controller
             ModalTypeId = ModalType.ModalTypeId
         };
 
-        await _userService.SaveUserResultInDb(user, new List<(TimeSpan, bool)>
-        {
-            (FirstModalTime, FirstModalResult),
-            (SecondModalTime, SecondModalResult),
-            (ThirdModalTime, ThirdModalResult)
-        });
+        await _userService.SaveUserResultInDb(user, resDictionary);
 
         return View(personality.ToDto());
     }
