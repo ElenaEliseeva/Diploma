@@ -1,5 +1,4 @@
-﻿<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+﻿<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
 <style>
@@ -83,34 +82,32 @@
 </style>
 
 <form asp-action="SecondTaskSaveResult" asp-controller="Test">
-    <div class="button-grid">
-        <div class="button-grid-keys">
-            <ul>
-                <li>
-                    <input type="checkbox" name="check" id="cow" />
-                    <label for="cow"><img src="~/icons/cow.png" width="700" height="200" /></label>
-                </li>
-                <li>
 
-                    <input type="checkbox" name="check" id="pig" />
-                    <label for="pig"><img src="~/icons/pig.png" width="300" height="200" /></label>
-                </li>
-                <li>
+    <table style="margin-left:auto;margin-right:auto;">
+        <ul>
+            <tr>
+                <td>
 
-                    <input type="checkbox" name="check" id="horse" />
-                    <label for="horse"><img src="~/icons/horse.png" width="300" height="200" /></label>
-                </li>
-                <li>
-                    <input type="checkbox" name="check" id="cock" />
-                    <label for="cock"><img src="~/icons/cock.png" width="300" height="200" /></label>
-                </li>
-            </ul>
-        </div>
-        
-        <p style="text-align: center">
-            <button type="submit" onclick="SaveSecondTaskResult()" class="btn btn-primary">Далее</button>
-        </p>
-    </div>
+                    <li>
+                        <input type="checkbox" name="check" id="cow"/>
+                        <label for="cow"><img src="~/icons/cow.png" width="300" height="200"/></label>
+                    </li>
+                </td>
+                <td><input type="checkbox" name="check" id="pig" />
+                    <label for="pig"><img src="~/icons/pig.png" width="300" height="200" /></label></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="check" id="horse" />
+                    <label for="horse"><img src="~/icons/horse.png" width="300" height="200" /></label></td>
+                <td><input type="checkbox" name="check" id="cock" />
+                    <label for="cock"><img src="~/icons/cock.png" width="300" height="200" /></label></td>
+            </tr>
+        </ul>
+    </table>
+
+    <p style="text-align: center">
+        <button type="submit" onclick="SaveSecondTaskResult()" class="btn btn-primary">Далее</button>
+    </p>
 
 </form>
 

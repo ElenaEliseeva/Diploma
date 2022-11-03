@@ -1,18 +1,22 @@
 ﻿@model PersonalityDto
 
-<div class="text-start">
-    <h1 class="display-4">Спасибо за прохождение теста!</h1>
-    <h6>Ваш ответ очень помог мне в моем исследовании!</h6>
+<div class="card" style="margin-top: 20px">
+    <h2 class="card-header">Спасибо за прохождение теста!</h2>
+    <div class="card-body">
+        <p class="card-text">Ваш ответ очень помог мне в моем исследовании!</p>
+    </div>
 </div>
 
-<div class="text-start">
-    <h1 class="display-4">Результат</h1>
-    <h2>@Model.PersonalityTitle</h2>
-    <h6>@Model.PersonalityDescription</h6>
-    <h6><a href="@Model.PersonalityLink">Читать подробное описание в источнике</a></h6>
-    <h6>Если вы хотите пройти тест ещё раз, то можете сделать это
+<h1 class="display-4">Результат</h1>
+
+<div class="card" style="margin-top: 20px">
+    <h2 class="card-header">@Model.PersonalityTitle</h2>
+    <div class="card-body">
+        <p class="card-text">@Model.PersonalityDescription</p>
+        <p class="card-text"><a href="@Model.PersonalityLink">Читать подробное описание в источнике</a></p>
+        Если вы хотите пройти тест ещё раз, то можете сделать это
         <a href="https://www.16personalities.com/ru/test-lichnosti">здесь</a>
         или
         <a href="https://my-type.ru/16types">здесь</a>
-    </h6>
+    </div>
 </div>

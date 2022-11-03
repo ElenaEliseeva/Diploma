@@ -22,10 +22,10 @@ public class TestController : Controller
     private static ModalType? ModalType;
     private static Test? CurrentTest;
 
-    private static readonly Dictionary<int, (TimeSpan modalTime, bool modalResult, bool? testResult)> resDictionary = new();
+    private static Dictionary<int, (TimeSpan modalTime, bool modalResult, bool? testResult)> ModalTestResultDictionary = new();
 
     private static string WordTestResult = null!;
-    private static Stopwatch? timer;
+    private static Stopwatch? Timer;
 
     public TestController(ILogger<TestController> logger, IQuizRepository quizRepository,
         IPersonalityRepository personalityRepository, IUserService userService, IModalTypeRepository modalTypeRepository)
@@ -85,30 +85,30 @@ public class TestController : Controller
 
     public void SaveModalResult(int modalNumber, bool modalResult)
     {
-        if (timer == null)
+        if (Timer == null)
         {
             throw new Exception();
         }
-        timer.Stop();
+        Timer.Stop();
 
         switch (modalNumber)
         {
             case 1:
-                resDictionary[1] = (timer.Elapsed, modalResult, null);
+                ModalTestResultDictionary[1] = (Timer.Elapsed, modalResult, null);
                 break;
             case 2:
-                resDictionary[2] = (timer.Elapsed, modalResult, null);
+                ModalTestResultDictionary[2] = (Timer.Elapsed, modalResult, null);
                 break;
             case 3:
-                resDictionary[3] = (timer.Elapsed, modalResult, null);
+                ModalTestResultDictionary[3] = (Timer.Elapsed, modalResult, null);
                 break;
         }
     }
 
     public IActionResult FirstTask()
     {
-        timer = new Stopwatch();
-        timer.Start();
+        Timer = new Stopwatch();
+        Timer.Start();
 
         ViewBag.ModalTypeId = ModalType.ModalTypeId;
 
@@ -117,9 +117,9 @@ public class TestController : Controller
 
     public void SaveTaskResult(int testNumber, bool selectedAction)
     {
-        if (!resDictionary.TryGetValue(testNumber, out var val)) return;
+        if (!ModalTestResultDictionary.TryGetValue(testNumber, out var val)) return;
         val.testResult = selectedAction;
-        resDictionary[testNumber] = val;
+        ModalTestResultDictionary[testNumber] = val;
     }
 
     public IActionResult FirstTaskSaveResult()
@@ -129,8 +129,8 @@ public class TestController : Controller
 
     public IActionResult SecondTask()
     {
-        timer = new Stopwatch();
-        timer.Start();
+        Timer = new Stopwatch();
+        Timer.Start();
 
         ViewBag.ModalTypeId = ModalType.ModalTypeId;
 
@@ -144,8 +144,8 @@ public class TestController : Controller
 
     public IActionResult ThirdTask()
     {
-        timer = new Stopwatch();
-        timer.Start();
+        Timer = new Stopwatch();
+        Timer.Start();
 
         ViewBag.ModalTypeId = ModalType.ModalTypeId;
 
@@ -161,7 +161,7 @@ public class TestController : Controller
     {
         var personality = await _personalityRepository.GetPersonalityByTitle(WordTestResult);
 
-        if (personality == null)
+        if (personality == null || ModalTestResultDictionary == null!)
         {
             _logger.LogInformation("Personality was null {personality}; Word test result: {WordTestResult}", personality, WordTestResult);
             return RedirectToAction("Index");
@@ -175,7 +175,9 @@ public class TestController : Controller
             ModalTypeId = ModalType.ModalTypeId
         };
 
-        await _userService.SaveUserResultInDb(user, resDictionary);
+        await _userService.SaveUserResultInDb(user, ModalTestResultDictionary);
+
+        ModalTestResultDictionary = null!;
 
         return View(personality.ToDto());
     }

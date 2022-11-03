@@ -12,33 +12,37 @@
 </style>
 
 <form asp-action="CreateTestResult" asp-controller="Test" onsubmit="return checkFormData()" method="post">
-    <div class="text-start">
-        <h1 class="display-4">Данные о вас</h1>
-        <h3>
+    
+    <h1 class="display-4">Данные о вас</h1>
+
+    <div class="card">
+        <div class="card-header" style="font-weight: bold">
             Сколько вам лет?
-        </h3>
-        <input type="number" required value="12" min="12" max="80" name="age" />
+        </div>
+        <input type="number" required value="12" min="12" max="80" name="age" style="padding-left: 10px"/>
     </div>
 
     <h1 class="display-4">Вопросы теста личности</h1>
 
-    <div>
-        <ul>
+    <div class="card">
+        <ul class="list-group list-group-flush">
             @for (var i = 0; i < Model.QuestionDto.Count; i++)
             {
-                <h6>@Model.QuestionDto[i].QuestionText</h6>
-                <li>
-                    <input type="hidden" asp-for="@Model.QuestionDto[i].Answers[0].AnswerTextResult" />
-                    <input aria-label="@($"group{i}")" type="checkbox" asp-for="QuestionDto[i].Answers[0].IsSelected" /> @Model.QuestionDto[i].Answers[0].AnswerText
-                    <br />
-                    <input type="hidden" asp-for="@Model.QuestionDto[i].Answers[1].AnswerTextResult" />
-                    <input aria-label="@($"group{i}")" type="checkbox" asp-for="QuestionDto[i].Answers[1].IsSelected" /> @Model.QuestionDto[i].Answers[1].AnswerText
+                <div class="card-header" style="font-weight: bold">
+                    @($"{i + 1}.") @Model.QuestionDto[i].QuestionText
+                </div>
+                <li class="list-group-item">
+                    <input type="hidden" asp-for="@Model.QuestionDto[i].Answers[0].AnswerTextResult"/>
+                    <input aria-label="@($"group{i}")" type="checkbox" asp-for="QuestionDto[i].Answers[0].IsSelected"/> @Model.QuestionDto[i].Answers[0].AnswerText
+                    <br/>
+                    <input type="hidden" asp-for="@Model.QuestionDto[i].Answers[1].AnswerTextResult"/>
+                    <input aria-label="@($"group{i}")" type="checkbox" asp-for="QuestionDto[i].Answers[1].IsSelected"/> @Model.QuestionDto[i].Answers[1].AnswerText
                 </li>
             }
         </ul>
     </div>
 
-    <p style="text-align: center">
+    <p style="text-align: center; margin-top: 20px">
         <button type="submit" class="btn btn-primary">Далее</button>
     </p>
 </form>
