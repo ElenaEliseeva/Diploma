@@ -16,6 +16,7 @@ namespace Diploma.Models
         public int PersonalityId { get; set; }
         public int ModalTypeId { get; set; }
         public int TestId { get; set; }
+        public DateTime UserCreateDate { get; set; }
 
         public virtual ModalType ModalType { get; set; } = null!;
         public virtual Personality Personality { get; set; } = null!;

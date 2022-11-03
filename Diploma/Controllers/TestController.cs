@@ -16,6 +16,7 @@ public class TestController : Controller
     private readonly IPersonalityRepository _personalityRepository;
     private readonly IModalTypeRepository _modalTypeRepository;
     private readonly IUserService _userService;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     private static bool TestType;
     private static int UserAge;
@@ -28,13 +29,14 @@ public class TestController : Controller
     private static Stopwatch? Timer;
 
     public TestController(ILogger<TestController> logger, IQuizRepository quizRepository,
-        IPersonalityRepository personalityRepository, IUserService userService, IModalTypeRepository modalTypeRepository)
+        IPersonalityRepository personalityRepository, IUserService userService, IModalTypeRepository modalTypeRepository, IDateTimeProvider dateTimeProvider)
     {
         _logger = logger;
         _quizRepository = quizRepository;
         _personalityRepository = personalityRepository;
         _userService = userService;
         _modalTypeRepository = modalTypeRepository;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public IActionResult Index()
@@ -172,7 +174,8 @@ public class TestController : Controller
             Age = UserAge,
             PersonalityId = personality.PersonalityId,
             TestId = CurrentTest.TestId,
-            ModalTypeId = ModalType.ModalTypeId
+            ModalTypeId = ModalType.ModalTypeId,
+            UserCreateDate = _dateTimeProvider.DateTimeNow
         };
 
         await _userService.SaveUserResultInDb(user, ModalTestResultDictionary);

@@ -84,7 +84,9 @@ namespace Diploma.DataAccess
                 entity.HasIndex(e => e.ModalTypeId, "Modal_Type_modal_type_id_uindex")
                     .IsUnique();
 
-                entity.Property(e => e.ModalTypeId).HasColumnName("modal_type_id");
+                entity.Property(e => e.ModalTypeId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("modal_type_id");
 
                 entity.Property(e => e.ModalTypeName).HasColumnName("modal_type_name");
             });
@@ -96,7 +98,9 @@ namespace Diploma.DataAccess
                 entity.HasIndex(e => e.PersonalityId, "Personality_personality_id_uindex")
                     .IsUnique();
 
-                entity.Property(e => e.PersonalityId).HasColumnName("personality_id");
+                entity.Property(e => e.PersonalityId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("personality_id");
 
                 entity.Property(e => e.PersonalityDescription).HasColumnName("personality_description");
 
@@ -238,6 +242,10 @@ namespace Diploma.DataAccess
                 entity.Property(e => e.PersonalityId).HasColumnName("personality_id");
 
                 entity.Property(e => e.TestId).HasColumnName("test_id");
+
+                entity.Property(e => e.UserCreateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("user_create_date");
 
                 entity.HasOne(d => d.ModalType)
                     .WithMany(p => p.Users)
