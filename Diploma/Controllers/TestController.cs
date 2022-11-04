@@ -23,7 +23,7 @@ public class TestController : Controller
     private static ModalType? ModalType;
     private static Test? CurrentTest;
 
-    private static Dictionary<int, (TimeSpan modalTime, bool modalResult, bool? testResult)> ModalTestResultDictionary = new();
+    private static Dictionary<int, (TimeSpan modalTime, bool modalResult, bool? testResult)>? ModalTestResultDictionary;
 
     private static string WordTestResult = null!;
     private static Stopwatch? Timer;
@@ -45,6 +45,8 @@ public class TestController : Controller
         var res = rnd.Next(2);
         TestType = res != 0;
         ViewBag.TestType = TestType;
+
+        ModalTestResultDictionary = new Dictionary<int, (TimeSpan modalTime, bool modalResult, bool? testResult)>();
 
         return View();
     }
@@ -161,13 +163,14 @@ public class TestController : Controller
 
     public async Task<IActionResult> TestResult()
     {
-        var personality = await _personalityRepository.GetPersonalityByTitle(WordTestResult);
-
-        if (personality == null || ModalTestResultDictionary == null!)
+        if (string.IsNullOrEmpty(WordTestResult) || ModalTestResultDictionary == null!)
         {
-            _logger.LogInformation("Personality was null {personality}; Word test result: {WordTestResult}", personality, WordTestResult);
+            _logger.LogInformation("Word test result: {WordTestResult}; Modal test dictionary: {ModalTestResultDictionary}", WordTestResult, ModalTestResultDictionary);
             return RedirectToAction("Index");
         }
+
+        var personality = await _personalityRepository.GetPersonalityByTitle(WordTestResult);
+
 
         var user = new User
         {
@@ -181,6 +184,7 @@ public class TestController : Controller
         await _userService.SaveUserResultInDb(user, ModalTestResultDictionary);
 
         ModalTestResultDictionary = null!;
+        WordTestResult = string.Empty;
 
         return View(personality.ToDto());
     }
