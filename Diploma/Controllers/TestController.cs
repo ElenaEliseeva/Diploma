@@ -111,9 +111,6 @@ public class TestController : Controller
 
     public IActionResult FirstTask()
     {
-        Timer = new Stopwatch();
-        Timer.Start();
-
         ViewBag.ModalTypeId = ModalType.ModalTypeId;
 
         return View();
@@ -125,6 +122,11 @@ public class TestController : Controller
         val.testResult = selectedAction;
         ModalTestResultDictionary[testNumber] = val;
     }
+    public void StartTimer()
+    {
+        Timer = new Stopwatch();
+        Timer.Start();
+    }
 
     public IActionResult FirstTaskSaveResult()
     {
@@ -133,9 +135,6 @@ public class TestController : Controller
 
     public IActionResult SecondTask()
     {
-        Timer = new Stopwatch();
-        Timer.Start();
-
         ViewBag.ModalTypeId = ModalType.ModalTypeId;
 
         return View();
@@ -148,9 +147,6 @@ public class TestController : Controller
 
     public IActionResult ThirdTask()
     {
-        Timer = new Stopwatch();
-        Timer.Start();
-
         ViewBag.ModalTypeId = ModalType.ModalTypeId;
 
         return View();
