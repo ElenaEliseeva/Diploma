@@ -61,7 +61,7 @@
                         <img src="~/icons/square-icon.png" alt="Warning">
                         break;
                 }
-                <h5 id="exampleModalBody">Чтобы сохранить результат на следующем экране нажмите на первую кнопку в первом ряду</h5>
+                <h5 id="exampleModalBody">Чтобы узнать результат теста, выберите вторую кнопку в третьем ряду.</h5>
             </div>
             <div class="modal-footer">
                 <button onclick="SaveModalResult(true)" name="buttonType" value="ok" type="submit" class="btn btn-primary" data-bs-dismiss="modal">Продолжить</button>
@@ -102,7 +102,7 @@
     }
 
     function SaveFirstTaskResult() {
-        let btn = document.getElementById('btn1');
+        let btn = document.getElementById('btn8');
         if (btn.style.backgroundColor === 'salmon') {
             $.get('/Test/SaveTaskResult?testNumber=1&selectedAction=true');
         } else {

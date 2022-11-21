@@ -1,0 +1,95 @@
+﻿<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+@model QuizDto
+@{
+    ViewData["Title"] = "Create";
+}
+
+<style>
+    ul {
+        list-style-type: none;
+    }
+</style>
+
+<form asp-action="ClarifyingQuestionsSaveResult" asp-controller="Test" onsubmit="return checkFormData()" method="post">
+
+    <h1 class="display-4">Уточняющие вопросы</h1>
+
+    <div class="card">
+        <div class="card-header" style="font-weight: bold">
+            Сколько вам лет?
+        </div>
+        <input type="number" required min="12" max="80" name="age" style="padding-left: 10px" />
+    </div>
+
+    <div class="card">
+        <div class="card-header" style="font-weight: bold">
+            На что вы обратили внимание при возникновении диалоговых сообщений в первую очередь?
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <input type="hidden" />
+                <input aria-label="group0" type="checkbox" /> На иконку
+                <br />
+                <input type="hidden" />
+                <input aria-label="group0" type="checkbox" /> На текст
+                <br />
+                <input type="hidden" />
+                <input aria-label="group0" type="checkbox" /> Не запомнил(а) что было первым
+                <br />
+                <input type="hidden" />
+                <input aria-label="group0" type="checkbox" /> Пропустил(а) диалоговое сообщение, действовал(а) наугад
+            </li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <div class="card-header" style="font-weight: bold">
+            Что, по вашему мнению, в большей степени помогало выполнять задания?
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <input type="hidden" />
+                <input aria-label="group1" type="checkbox" /> Иконка
+                <br />
+                <input type="hidden" />
+                <input aria-label="group1" type="checkbox" /> Текст
+                <br />
+                <input type="hidden" />
+                <input aria-label="group1" type="checkbox" /> Иконка и текст помогали в равной степени
+                <br />
+                <input type="hidden" />
+                <input aria-label="group1" type="checkbox" /> Пропустил(а) диалоговое сообщение, действовал(а) наугад
+            </li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <div class="card-header" style="font-weight: bold">
+            Если у вас возникли трудности при прохождении теста или просто есть какие-то комментарии, напишите об этом, пожалуйста.
+        </div>
+        <input type="text" required />
+    </div>
+
+    <p style="text-align: center; margin-top: 20px">
+        <button type="submit" class="btn btn-primary">Далее</button>
+    </p>
+</form>
+
+<script type="text/javascript">
+    $('input[type="checkbox"]').on('change', function () {
+        var attrValue = this.getAttribute("aria-label");
+        $('input[aria-label="' + attrValue + '"]').not(this).prop('checked', false);
+    });
+
+    function checkFormData() {
+        for (let i = 0; i < 2; i++) {
+            var value = `group${i}`;
+            if (!$('input[aria-label="' + value + '"]:checked').length > 0) {
+                alert('Заполните все ответы на вопросы!');
+                return false;
+            }
+        }
+        return true;
+    }
+</script>

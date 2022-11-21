@@ -9,8 +9,7 @@ using Diploma.Services;
 
 namespace Diploma.Controllers;
 
-public class TestController : Controller
-{
+public class TestController : Controller {
     private readonly ILogger<TestController> _logger;
     private readonly IQuizRepository _quizRepository;
     private readonly IPersonalityRepository _personalityRepository;
@@ -29,8 +28,7 @@ public class TestController : Controller
     private static Stopwatch? Timer;
 
     public TestController(ILogger<TestController> logger, IQuizRepository quizRepository,
-        IPersonalityRepository personalityRepository, IUserService userService, IModalTypeRepository modalTypeRepository, IDateTimeProvider dateTimeProvider)
-    {
+        IPersonalityRepository personalityRepository, IUserService userService, IModalTypeRepository modalTypeRepository, IDateTimeProvider dateTimeProvider) {
         _logger = logger;
         _quizRepository = quizRepository;
         _personalityRepository = personalityRepository;
@@ -39,8 +37,7 @@ public class TestController : Controller
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public IActionResult Index()
-    {
+    public IActionResult Index() {
         var rnd = new Random();
         var res = rnd.Next(2);
         TestType = res != 0;
@@ -51,8 +48,7 @@ public class TestController : Controller
         return View();
     }
 
-    public async Task<IActionResult> Create()
-    {
+    public async Task<IActionResult> Create() {
         CurrentTest = await _quizRepository.GetTestByType(TestType);
 
         var rnd = new Random();
@@ -63,10 +59,8 @@ public class TestController : Controller
     }
 
     [HttpPost]
-    public IActionResult CreateTestResult([FromForm] QuizDto quizDto, int age)
-    {
-        switch (TestType)
-        {
+    public IActionResult CreateTestResult([FromForm] QuizDto quizDto) {
+        switch (TestType) {
             case true:
                 WordTestResult = string.Join("", quizDto.QuestionDto
                     .SelectMany(x => x.Answers)
@@ -82,21 +76,16 @@ public class TestController : Controller
                 break;
         }
 
-        UserAge = age;
-
         return RedirectToAction("FirstTask");
     }
 
-    public void SaveModalResult(int modalNumber, bool modalResult)
-    {
-        if (Timer == null)
-        {
+    public void SaveModalResult(int modalNumber, bool modalResult) {
+        if (Timer == null) {
             throw new Exception();
         }
         Timer.Stop();
 
-        switch (modalNumber)
-        {
+        switch (modalNumber) {
             case 1:
                 ModalTestResultDictionary[1] = (Timer.Elapsed, modalResult, null);
                 break;
@@ -109,67 +98,64 @@ public class TestController : Controller
         }
     }
 
-    public IActionResult FirstTask()
-    {
+    public IActionResult FirstTask() {
         ViewBag.ModalTypeId = ModalType.ModalTypeId;
 
         return View();
     }
 
-    public void SaveTaskResult(int testNumber, bool selectedAction)
-    {
+    public void SaveTaskResult(int testNumber, bool selectedAction) {
         if (!ModalTestResultDictionary.TryGetValue(testNumber, out var val)) return;
         val.testResult = selectedAction;
         ModalTestResultDictionary[testNumber] = val;
     }
-    public void StartTimer()
-    {
+    public void StartTimer() {
         Timer = new Stopwatch();
         Timer.Start();
     }
 
-    public IActionResult FirstTaskSaveResult()
-    {
+    public IActionResult FirstTaskSaveResult() {
         return RedirectToAction("SecondTask");
     }
 
-    public IActionResult SecondTask()
-    {
+    public IActionResult SecondTask() {
         ViewBag.ModalTypeId = ModalType.ModalTypeId;
 
         return View();
     }
 
-    public IActionResult SecondTaskSaveResult()
-    {
+    public IActionResult SecondTaskSaveResult() {
         return RedirectToAction("ThirdTask");
     }
 
-    public IActionResult ThirdTask()
-    {
+    public IActionResult ThirdTask() {
         ViewBag.ModalTypeId = ModalType.ModalTypeId;
 
         return View();
     }
 
-    public IActionResult ThirdTaskSaveResult()
-    {
+    public IActionResult ThirdTaskSaveResult() {
+        return RedirectToAction("ClarifyingQuestions");
+    }
+
+    public IActionResult ClarifyingQuestions() {
+        return View();
+    }
+
+    public IActionResult ClarifyingQuestionsSaveResult(int age) {
+        UserAge = age;
         return RedirectToAction("TestResult");
     }
 
-    public async Task<IActionResult> TestResult()
-    {
-        if (string.IsNullOrEmpty(WordTestResult) || ModalTestResultDictionary == null!)
-        {
+    public async Task<IActionResult> TestResult() {
+        if (string.IsNullOrEmpty(WordTestResult) || ModalTestResultDictionary == null!) {
             _logger.LogInformation("Word test result: {WordTestResult}; Modal test dictionary: {ModalTestResultDictionary}", WordTestResult, ModalTestResultDictionary);
             return RedirectToAction("Index");
         }
 
         var personality = await _personalityRepository.GetPersonalityByTitle(WordTestResult);
 
-
-        var user = new User
-        {
+        var user = new User {
             Age = UserAge,
             PersonalityId = personality.PersonalityId,
             TestId = CurrentTest.TestId,

@@ -85,23 +85,26 @@
 
     <table style="margin-left:auto;margin-right:auto;">
         <ul>
-            <tr>
-                <td>
-
-                    <li>
-                        <input type="checkbox" name="check" id="cow"/>
-                        <label for="cow"><img src="~/icons/cow.png" width="300" height="200"/></label>
-                    </li>
-                </td>
-                <td><input type="checkbox" name="check" id="pig" />
-                    <label for="pig"><img src="~/icons/pig.png" width="300" height="200" /></label></td>
-            </tr>
-            <tr>
-                <td><input type="checkbox" name="check" id="horse" />
-                    <label for="horse"><img src="~/icons/horse.png" width="300" height="200" /></label></td>
-                <td><input type="checkbox" name="check" id="cock" />
-                    <label for="cock"><img src="~/icons/cock.png" width="300" height="200" /></label></td>
-            </tr>
+        <tr>
+            <td>
+                <input type="checkbox" name="check" id="pig" />
+                <label for="pig"><img src="~/icons/pig.webp" width="300" height="200" /></label>
+            </td>
+            <td>
+                <input type="checkbox" name="check" id="cow" />
+                <label for="cow"><img src="~/icons/cow.webp" width="300" height="200" /></label>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="checkbox" name="check" id="cock" />
+                <label for="cock"><img src="~/icons/cock.webp" width="300" height="200" /></label>
+            </td>
+            <td>
+                <input type="checkbox" name="check" id="horse" />
+                <label for="horse"><img src="~/icons/horse.webp" width="300" height="200" /></label>
+            </td>
+        </tr>
         </ul>
     </table>
 
@@ -119,8 +122,7 @@
                 <button onclick="SaveModalResult(false)" name="buttonType" value="false" type="submit" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @switch (ViewBag.ModalTypeId)
-                {
+                @switch (ViewBag.ModalTypeId) {
                     case 1:
                         break;
                     case 2:
@@ -130,7 +132,7 @@
                         <img src="~/icons/cow-icon.png" alt="Warning">
                         break;
                 }
-                <h5 id="exampleModalBody">Чтобы сохранить результат на следующем экране выберите животное “Корова”.</h5>
+                <h5 id="exampleModalBody">Чтобы узнать результат теста, выберите животное “Корова”.</h5>
             </div>
             <div class="modal-footer">
                 <button onclick="SaveModalResult(true)" name="buttonType" value="ok" type="submit" class="btn btn-primary" data-bs-dismiss="modal">Продолжить</button>
