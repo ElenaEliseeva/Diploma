@@ -7,8 +7,7 @@ namespace Diploma.Models
     {
         public User()
         {
-            ModalTimes = new HashSet<ModalTime>();
-            SecondTests = new HashSet<SecondTest>();
+            TestResults = new HashSet<TestResult>();
         }
 
         public int UserId { get; set; }
@@ -17,11 +16,14 @@ namespace Diploma.Models
         public int ModalTypeId { get; set; }
         public int TestId { get; set; }
         public DateTime UserCreateDate { get; set; }
+        public TimeSpan TestTimeResult { get; set; }
+        public string ClarifyingQuestionOne { get; set; } = null!;
+        public string ClarifyingQuestionTwo { get; set; } = null!;
+        public string? ClarifyingQuestionThree { get; set; }
 
         public virtual ModalType ModalType { get; set; } = null!;
         public virtual Personality Personality { get; set; } = null!;
         public virtual Test Test { get; set; } = null!;
-        public virtual ICollection<ModalTime> ModalTimes { get; set; }
-        public virtual ICollection<SecondTest> SecondTests { get; set; }
+        public virtual ICollection<TestResult> TestResults { get; set; }
     }
 }

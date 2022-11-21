@@ -20,31 +20,23 @@ public class UserService : IUserService
         {
             await _dbContext.Database.BeginTransactionAsync();
 
-            await _dbContext.AddAsync(user);
-
             var counter = 1;
             foreach (var modalValue in modalTestResults)
             {
-                var modalTimeEntity = new ModalTime
+                var testResultEntity = new TestResult
                 {
-                    ModalNumber = counter,
+                    TestNumber = counter,
                     ModalTimeResult = modalValue.Value.Item1,
                     ModalResult = modalValue.Value.Item2,
+                    TestResultt = (bool)modalValue.Value.Item3,
                     UserId = user.UserId
                 };
 
-                var secondTestEntity = new SecondTest
-                {
-                    UserId = user.UserId,
-                    SecondTestNumber = counter,
-                    SecondTestResult = (bool)modalValue.Value.Item3
-                };
-
                 counter++;
-                user.ModalTimes.Add(modalTimeEntity);
-                user.SecondTests.Add(secondTestEntity);
-                await _dbContext.AddAsync(modalTimeEntity);
+                user.TestResults.Add(testResultEntity);
             }
+
+            await _dbContext.AddAsync(user);
 
             await _dbContext.SaveChangesAsync();
             await _dbContext.Database.CommitTransactionAsync();

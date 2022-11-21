@@ -24,6 +24,10 @@ public class TestController : Controller {
 
     private static Dictionary<int, (TimeSpan modalTime, bool modalResult, bool? testResult)>? ModalTestResultDictionary;
 
+    private static string ClarifyingQuestionOne;
+    private static string ClarifyingQuestionTwo;
+    private static string ClarifyingQuestionThree;
+
     private static string WordTestResult = null!;
     private static Stopwatch? Timer;
 
@@ -142,8 +146,11 @@ public class TestController : Controller {
         return View();
     }
 
-    public IActionResult ClarifyingQuestionsSaveResult(int age) {
+    public IActionResult ClarifyingQuestionsSaveResult(int age, string clarifyingQuestionOne, string clarifyingQuestionTwo, string clarifyingQuestionThree) {
         UserAge = age;
+        ClarifyingQuestionOne = clarifyingQuestionOne;
+        ClarifyingQuestionTwo = clarifyingQuestionTwo;
+        ClarifyingQuestionThree = clarifyingQuestionThree;
         return RedirectToAction("TestResult");
     }
 
@@ -160,7 +167,10 @@ public class TestController : Controller {
             PersonalityId = personality.PersonalityId,
             TestId = CurrentTest.TestId,
             ModalTypeId = ModalType.ModalTypeId,
-            UserCreateDate = _dateTimeProvider.DateTimeNow
+            UserCreateDate = _dateTimeProvider.DateTimeNow,
+            ClarifyingQuestionOne = ClarifyingQuestionOne,
+            ClarifyingQuestionTwo = ClarifyingQuestionTwo,
+            ClarifyingQuestionThree = ClarifyingQuestionThree
         };
 
         await _userService.SaveUserResultInDb(user, ModalTestResultDictionary);

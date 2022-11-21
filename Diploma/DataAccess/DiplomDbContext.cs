@@ -14,14 +14,13 @@ namespace Diploma.DataAccess
         }
 
         public virtual DbSet<Answer> Answers { get; set; } = null!;
-        public virtual DbSet<ModalTime> ModalTimes { get; set; } = null!;
         public virtual DbSet<ModalType> ModalTypes { get; set; } = null!;
         public virtual DbSet<Personality> Personalities { get; set; } = null!;
         public virtual DbSet<Question> Questions { get; set; } = null!;
         public virtual DbSet<QuestionAnswer> QuestionAnswers { get; set; } = null!;
-        public virtual DbSet<SecondTest> SecondTests { get; set; } = null!;
         public virtual DbSet<Test> Tests { get; set; } = null!;
         public virtual DbSet<TestQuestion> TestQuestions { get; set; } = null!;
+        public virtual DbSet<TestResult> TestResults { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -50,31 +49,6 @@ namespace Diploma.DataAccess
                     .IsUnicode(false)
                     .HasColumnName("answer_text_result")
                     .IsFixedLength();
-            });
-
-            modelBuilder.Entity<ModalTime>(entity =>
-            {
-                entity.ToTable("Modal_Time");
-
-                entity.HasIndex(e => e.UserId, "IX_Modal_Time_user_id");
-
-                entity.HasIndex(e => e.ModalTimeId, "Modal_Time_modal_time_id_uindex")
-                    .IsUnique();
-
-                entity.Property(e => e.ModalTimeId).HasColumnName("modal_time_id");
-
-                entity.Property(e => e.ModalNumber).HasColumnName("modal_number");
-
-                entity.Property(e => e.ModalResult).HasColumnName("modal_result");
-
-                entity.Property(e => e.ModalTimeResult).HasColumnName("modal_time_result");
-
-                entity.Property(e => e.UserId).HasColumnName("user_id");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.ModalTimes)
-                    .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("Modal_Time_User_user_id_fk");
             });
 
             modelBuilder.Entity<ModalType>(entity =>
@@ -155,27 +129,6 @@ namespace Diploma.DataAccess
                     .HasConstraintName("Question_Answer_Question_question_id_fk");
             });
 
-            modelBuilder.Entity<SecondTest>(entity =>
-            {
-                entity.ToTable("Second_Test");
-
-                entity.HasIndex(e => e.SecondTestId, "Second_Test_Result_second_test_result_uindex")
-                    .IsUnique();
-
-                entity.Property(e => e.SecondTestId).HasColumnName("second_test_id");
-
-                entity.Property(e => e.SecondTestNumber).HasColumnName("second_test_number");
-
-                entity.Property(e => e.SecondTestResult).HasColumnName("second_test_result");
-
-                entity.Property(e => e.UserId).HasColumnName("user_id");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.SecondTests)
-                    .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("Second_Test_User_user_id_fk");
-            });
-
             modelBuilder.Entity<Test>(entity =>
             {
                 entity.ToTable("Test");
@@ -220,6 +173,33 @@ namespace Diploma.DataAccess
                     .HasConstraintName("Test_Question_Test_test_id_fk");
             });
 
+            modelBuilder.Entity<TestResult>(entity =>
+            {
+                entity.ToTable("Test_Result");
+
+                entity.Property(e => e.TestResultId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("test_result_id");
+
+                entity.Property(e => e.ModalResult).HasColumnName("modal_result");
+
+                entity.Property(e => e.ModalTimeResult).HasColumnName("modal_time_result");
+
+                entity.Property(e => e.TestNumber).HasColumnName("test_number");
+
+                entity.Property(e => e.TestResultt).HasColumnName("test_resultt");
+
+                entity.Property(e => e.TestTimeResult).HasColumnName("test_time_result");
+
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.TestResults)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("Test_Result_User_null_fk");
+            });
+
             modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("User");
@@ -237,11 +217,19 @@ namespace Diploma.DataAccess
 
                 entity.Property(e => e.Age).HasColumnName("age");
 
+                entity.Property(e => e.ClarifyingQuestionOne).HasColumnName("clarifying_question_one");
+
+                entity.Property(e => e.ClarifyingQuestionThree).HasColumnName("clarifying_question_three");
+
+                entity.Property(e => e.ClarifyingQuestionTwo).HasColumnName("clarifying_question_two");
+
                 entity.Property(e => e.ModalTypeId).HasColumnName("modal_type_id");
 
                 entity.Property(e => e.PersonalityId).HasColumnName("personality_id");
 
                 entity.Property(e => e.TestId).HasColumnName("test_id");
+
+                entity.Property(e => e.TestTimeResult).HasColumnName("test_time_result");
 
                 entity.Property(e => e.UserCreateDate)
                     .HasColumnType("datetime")
