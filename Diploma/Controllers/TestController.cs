@@ -22,14 +22,16 @@ public class TestController : Controller {
     private static ModalType? ModalType;
     private static Test? CurrentTest;
 
-    private static Dictionary<int, (TimeSpan modalTime, bool modalResult, bool? testResult)>? ModalTestResultDictionary;
+    private static Dictionary<int, (TimeSpan modalTime, TimeSpan? testTime, bool modalResult, bool? testResult)>? ModalTestResultDictionary;
 
     private static string ClarifyingQuestionOne;
     private static string ClarifyingQuestionTwo;
     private static string ClarifyingQuestionThree;
 
     private static string WordTestResult = null!;
-    private static Stopwatch? Timer;
+    private static Stopwatch? ModalTimer;
+    private static Stopwatch? TaskTimer;
+    private static Stopwatch? TestTimeTimer;
 
     public TestController(ILogger<TestController> logger, IQuizRepository quizRepository,
         IPersonalityRepository personalityRepository, IUserService userService, IModalTypeRepository modalTypeRepository, IDateTimeProvider dateTimeProvider) {
@@ -47,7 +49,7 @@ public class TestController : Controller {
         TestType = res != 0;
         ViewBag.TestType = TestType;
 
-        ModalTestResultDictionary = new Dictionary<int, (TimeSpan modalTime, bool modalResult, bool? testResult)>();
+        ModalTestResultDictionary = new Dictionary<int, (TimeSpan modalTime, TimeSpan? testTime, bool modalResult, bool? testResult)>();
 
         return View();
     }
@@ -58,12 +60,16 @@ public class TestController : Controller {
         var rnd = new Random();
         var res = rnd.Next(1, 4);
         ModalType = await _modalTypeRepository.GetModalTypeById(res);
+        TestTimeTimer = new Stopwatch();
+        TestTimeTimer.Start();
 
         return View(CurrentTest.ToDto());
     }
 
     [HttpPost]
     public IActionResult CreateTestResult([FromForm] QuizDto quizDto) {
+
+        TestTimeTimer.Stop();
         switch (TestType) {
             case true:
                 WordTestResult = string.Join("", quizDto.QuestionDto
@@ -84,22 +90,25 @@ public class TestController : Controller {
     }
 
     public void SaveModalResult(int modalNumber, bool modalResult) {
-        if (Timer == null) {
+        if (ModalTimer == null) {
             throw new Exception();
         }
-        Timer.Stop();
+        ModalTimer.Stop();
 
         switch (modalNumber) {
             case 1:
-                ModalTestResultDictionary[1] = (Timer.Elapsed, modalResult, null);
+                ModalTestResultDictionary[1] = (ModalTimer.Elapsed, null, modalResult, null);
                 break;
             case 2:
-                ModalTestResultDictionary[2] = (Timer.Elapsed, modalResult, null);
+                ModalTestResultDictionary[2] = (ModalTimer.Elapsed, null, modalResult, null);
                 break;
             case 3:
-                ModalTestResultDictionary[3] = (Timer.Elapsed, modalResult, null);
+                ModalTestResultDictionary[3] = (ModalTimer.Elapsed, null, modalResult, null);
                 break;
         }
+
+        TaskTimer = new Stopwatch();
+        TaskTimer.Start();
     }
 
     public IActionResult FirstTask() {
@@ -109,13 +118,16 @@ public class TestController : Controller {
     }
 
     public void SaveTaskResult(int testNumber, bool selectedAction) {
+        TaskTimer.Stop();
         if (!ModalTestResultDictionary.TryGetValue(testNumber, out var val)) return;
         val.testResult = selectedAction;
+        val.testTime = TaskTimer.Elapsed;
         ModalTestResultDictionary[testNumber] = val;
     }
+
     public void StartTimer() {
-        Timer = new Stopwatch();
-        Timer.Start();
+        ModalTimer = new Stopwatch();
+        ModalTimer.Start();
     }
 
     public IActionResult FirstTaskSaveResult() {
@@ -168,6 +180,7 @@ public class TestController : Controller {
             TestId = CurrentTest.TestId,
             ModalTypeId = ModalType.ModalTypeId,
             UserCreateDate = _dateTimeProvider.DateTimeNow,
+            TestTimeResult = TestTimeTimer.Elapsed,
             ClarifyingQuestionOne = ClarifyingQuestionOne,
             ClarifyingQuestionTwo = ClarifyingQuestionTwo,
             ClarifyingQuestionThree = ClarifyingQuestionThree

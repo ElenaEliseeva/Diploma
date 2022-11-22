@@ -177,9 +177,7 @@ namespace Diploma.DataAccess
             {
                 entity.ToTable("Test_Result");
 
-                entity.Property(e => e.TestResultId)
-                    .ValueGeneratedNever()
-                    .HasColumnName("test_result_id");
+                entity.Property(e => e.TestResultId).HasColumnName("test_result_id");
 
                 entity.Property(e => e.ModalResult).HasColumnName("modal_result");
 
