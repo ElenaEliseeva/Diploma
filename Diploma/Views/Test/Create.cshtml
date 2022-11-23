@@ -1,22 +1,44 @@
 ﻿<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 <!-- Yandex.Metrika counter -->
-<script type="text/javascript" >
-   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-   m[i].l=1*new Date();
-   for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+<script type="text/javascript">
+    (function (m, e, t, r, i, k, a) {
+        m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments) };
+        m[i].l = 1 * new Date();
+        for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
+        k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
+    })
+        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
 
-   ym(91318698, "init", {
-        clickmap:true,
-        trackLinks:true,
-        accurateTrackBounce:true,
-        webvisor:true
-   });
+    ym(91319732, "init", {
+        clickmap: true,
+        trackLinks: true,
+        accurateTrackBounce: true,
+        webvisor: true
+    });
+
+    ym(91319732, "params", {
+        "testtype": getCookie('testtype'),
+        "picttype": getCookie('picttype')
+    });
+
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
 </script>
-<noscript><div><img src="https://mc.yandex.ru/watch/91318698" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<noscript><div><img src="https://mc.yandex.ru/watch/91319732" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
-
 @model QuizDto
 @{
     ViewData["Title"] = "Create";
@@ -34,17 +56,16 @@
 
     <div class="card">
         <ul class="list-group list-group-flush">
-            @for (var i = 0; i < Model.QuestionDto.Count; i++)
-            {
+            @for (var i = 0; i < Model.QuestionDto.Count; i++) {
                 <div class="card-header" style="font-weight: bold">
                     @($"{i + 1}.") @Model.QuestionDto[i].QuestionText
                 </div>
                 <li class="list-group-item">
-                    <input type="hidden" asp-for="@Model.QuestionDto[i].Answers[0].AnswerTextResult"/>
-                    <input aria-label="@($"group{i}")" type="checkbox" asp-for="QuestionDto[i].Answers[0].IsSelected"/> @Model.QuestionDto[i].Answers[0].AnswerText
-                    <br/>
-                    <input type="hidden" asp-for="@Model.QuestionDto[i].Answers[1].AnswerTextResult"/>
-                    <input aria-label="@($"group{i}")" type="checkbox" asp-for="QuestionDto[i].Answers[1].IsSelected"/> @Model.QuestionDto[i].Answers[1].AnswerText
+                    <input type="hidden" asp-for="@Model.QuestionDto[i].Answers[0].AnswerTextResult" />
+                    <input aria-label="@($"group{i}")" type="checkbox" asp-for="QuestionDto[i].Answers[0].IsSelected" /> @Model.QuestionDto[i].Answers[0].AnswerText
+                    <br />
+                    <input type="hidden" asp-for="@Model.QuestionDto[i].Answers[1].AnswerTextResult" />
+                    <input aria-label="@($"group{i}")" type="checkbox" asp-for="QuestionDto[i].Answers[1].IsSelected" /> @Model.QuestionDto[i].Answers[1].AnswerText
                 </li>
             }
         </ul>

@@ -56,12 +56,14 @@ public class TestController : Controller {
 
     public async Task<IActionResult> Create() {
         CurrentTest = await _quizRepository.GetTestByType(TestType);
-
         var rnd = new Random();
         var res = rnd.Next(1, 4);
         ModalType = await _modalTypeRepository.GetModalTypeById(res);
         TestTimeTimer = new Stopwatch();
         TestTimeTimer.Start();
+
+        Response.Cookies.Append("testtype", CurrentTest.TestId.ToString());
+        Response.Cookies.Append("picttype", ModalType.ModalTypeId.ToString());
 
         return View(CurrentTest.ToDto());
     }
