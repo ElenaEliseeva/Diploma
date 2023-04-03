@@ -3,9 +3,9 @@ using Diploma.Mapping;
 using Microsoft.AspNetCore.Mvc;
 using Diploma.Repository;
 using System.Diagnostics;
-using Diploma.Helpers;
 using Diploma.Models;
 using Diploma.Services;
+using Diploma.Helpers;
 
 namespace Diploma.Controllers;
 
@@ -17,21 +17,19 @@ public class TestController : Controller {
     private readonly IUserService _userService;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    private static bool TestType;
-    private static int UserAge;
-    private static ModalType? ModalType;
-    private static Test? CurrentTest;
+    private const string UserAge = "_UserAge";
+    private const string ModalType = "_ModalType";
+    private const string CurrentTest = "_CurrentTest";
+    private const string ClarifyingQuestionOne = "_ClarifyingQuestionOne";
+    private const string ClarifyingQuestionTwo = "_ClarifyingQuestionTwo";
+    private const string ClarifyingQuestionThree = "_ClarifyingQuestionThree";
+    private const string WordTestResult = "_WordTestResult";
+    private const string ModalTestResult = "_ModalTestResult";
 
-    private static Dictionary<int, (TimeSpan modalTime, TimeSpan? testTime, bool modalResult, bool? testResult)>? ModalTestResultDictionary;
+    private static Dictionary<string, Stopwatch> stopWatchTestTimeDictionary = new Dictionary<string, Stopwatch>();
+    private static Dictionary<string, Stopwatch> stopWatchModalTimeDictionary = new Dictionary<string, Stopwatch>();
+    private static Dictionary<string, Stopwatch> stopWatchTaskTimeDictionary = new Dictionary<string, Stopwatch>();
 
-    private static string ClarifyingQuestionOne;
-    private static string ClarifyingQuestionTwo;
-    private static string ClarifyingQuestionThree;
-
-    private static string WordTestResult = null!;
-    private static Stopwatch? ModalTimer;
-    private static Stopwatch? TaskTimer;
-    private static Stopwatch? TestTimeTimer;
 
     public TestController(ILogger<TestController> logger, IQuizRepository quizRepository,
         IPersonalityRepository personalityRepository, IUserService userService, IModalTypeRepository modalTypeRepository, IDateTimeProvider dateTimeProvider) {
@@ -44,92 +42,97 @@ public class TestController : Controller {
     }
 
     public IActionResult Index() {
-        var rnd = new Random();
-        var res = rnd.Next(2);
-        TestType = res != 0;
-        ViewBag.TestType = TestType;
-
-        ModalTestResultDictionary = new Dictionary<int, (TimeSpan modalTime, TimeSpan? testTime, bool modalResult, bool? testResult)>();
-
         return View();
     }
 
     public async Task<IActionResult> Create() {
-        CurrentTest = await _quizRepository.GetTestByType(TestType);
-        var rnd = new Random();
-        var res = rnd.Next(1, 4);
-        ModalType = await _modalTypeRepository.GetModalTypeById(res);
-        TestTimeTimer = new Stopwatch();
-        TestTimeTimer.Start();
+        try
+        {
+            HttpContext.Session.Set<Test>(CurrentTest, await _quizRepository.GetTestByType(false));
 
-        Response.Cookies.Append("testtype", CurrentTest.TestId.ToString());
-        Response.Cookies.Append("picttype", ModalType.ModalTypeId.ToString());
+            var rnd = new Random();
+            var res = rnd.Next(1, 4);
 
-        return View(CurrentTest.ToDto());
+            HttpContext.Session.Set<ModalType>(ModalType, await _modalTypeRepository.GetModalTypeById(res));
+
+            var testTimeTimeStopwatch = new Stopwatch();
+            testTimeTimeStopwatch.Start();
+
+            stopWatchTestTimeDictionary[HttpContext.Session.Id] = testTimeTimeStopwatch;
+
+
+            Response.Cookies.Append("testtype", "2");
+            Response.Cookies.Append("picttype", HttpContext.Session.Get<ModalType>(ModalType).ModalTypeId.ToString());
+        }
+        catch (Exception ex)
+        {
+            LogWriter.Write("Error in create; " + ex.Message + "; " + ex.StackTrace);
+        }
+
+        return View(HttpContext.Session.Get<Test>(CurrentTest).ToDto());
     }
 
     [HttpPost]
-    public IActionResult CreateTestResult([FromForm] QuizDto quizDto) {
+    public IActionResult CreateTestResult([FromForm] QuizDto quizDto)
+    {
+        var timer = stopWatchTestTimeDictionary[HttpContext.Session.Id];
+        timer.Stop();
 
-        TestTimeTimer.Stop();
-        switch (TestType) {
-            case true:
-                WordTestResult = string.Join("", quizDto.QuestionDto
-                    .SelectMany(x => x.Answers)
-                    .Where(x => x.IsSelected)
-                    .Select(x => x.AnswerTextResult));
-                break;
-            case false:
-                WordTestResult = TestResultHelper.CreateWordFromTestResults(quizDto.QuestionDto
-                    .SelectMany(x => x.Answers)
-                    .Where(x => x.IsSelected)
-                    .Select(x => char.Parse(x.AnswerTextResult))
-                    .ToList());
-                break;
+        try
+        {
+            HttpContext.Session.Set<string>(WordTestResult, TestResultHelper.CreateWordFromTestResults(quizDto
+                .QuestionDto
+                .SelectMany(x => x.Answers)
+                .Where(x => x.IsSelected)
+                .Select(x => char.Parse(x.AnswerTextResult))
+                .ToList()));
+        }
+        catch (Exception ex)
+        {
+            LogWriter.Write("Error in selecting questions; " + ex.Message + "; " + ex.StackTrace);
         }
 
         return RedirectToAction("FirstTask");
     }
 
-    public void SaveModalResult(int modalNumber, bool modalResult) {
-        if (ModalTimer == null) {
-            throw new Exception();
-        }
-        ModalTimer.Stop();
+    public void SaveModalResult(int modalNumber, bool modalResult)
+    {
+        var modalTimer = stopWatchModalTimeDictionary[HttpContext.Session.Id];
+        modalTimer.Stop();
 
-        switch (modalNumber) {
-            case 1:
-                ModalTestResultDictionary[1] = (ModalTimer.Elapsed, null, modalResult, null);
-                break;
-            case 2:
-                ModalTestResultDictionary[2] = (ModalTimer.Elapsed, null, modalResult, null);
-                break;
-            case 3:
-                ModalTestResultDictionary[3] = (ModalTimer.Elapsed, null, modalResult, null);
-                break;
-        }
+        HttpContext.Session.Set<(TimeSpan modalTime, TimeSpan? testTime, bool modalResult, bool? testResult)>
+            ($"{ModalTestResult}{modalNumber}", (modalTimer.Elapsed, null, modalResult, null));
 
-        TaskTimer = new Stopwatch();
-        TaskTimer.Start();
+        var taskTimer = new Stopwatch();
+        taskTimer.Start();
+
+        stopWatchTaskTimeDictionary[HttpContext.Session.Id] = taskTimer;
     }
 
     public IActionResult FirstTask() {
-        ViewBag.ModalTypeId = ModalType.ModalTypeId;
-
+        ViewBag.ModalTypeId = HttpContext.Session.Get<ModalType>(ModalType).ModalTypeId;
         return View();
     }
 
-    public void SaveTaskResult(int testNumber, bool selectedAction) {
-        TaskTimer.Stop();
-        if (!ModalTestResultDictionary.TryGetValue(testNumber, out var val)) return;
+    public void SaveTaskResult(int testNumber, bool selectedAction)
+    {
+        var taskTimer = stopWatchTaskTimeDictionary[HttpContext.Session.Id];
+        taskTimer.Stop();
+
+        var val = HttpContext.Session.Get<(TimeSpan modalTime, TimeSpan? testTime, bool modalResult, bool? testResult)>
+            ($"{ModalTestResult}{testNumber}");
+
         val.testResult = selectedAction;
-        val.testTime = TaskTimer.Elapsed;
-        ModalTestResultDictionary[testNumber] = val;
+        val.testTime = taskTimer.Elapsed;
+
+        HttpContext.Session.Set($"{ModalTestResult}{testNumber}", val);
     }
 
     public void StartTimer() {
-        ModalTimer = new Stopwatch();
-        ModalTimer.Start();
+        var modalTimer = new Stopwatch();
+        modalTimer.Start();
+
+        stopWatchModalTimeDictionary[HttpContext.Session.Id] = modalTimer;
     }
 
     public IActionResult FirstTaskSaveResult() {
@@ -137,7 +140,7 @@ public class TestController : Controller {
     }
 
     public IActionResult SecondTask() {
-        ViewBag.ModalTypeId = ModalType.ModalTypeId;
+        ViewBag.ModalTypeId = HttpContext.Session.Get<ModalType>(ModalType).ModalTypeId;
 
         return View();
     }
@@ -147,7 +150,7 @@ public class TestController : Controller {
     }
 
     public IActionResult ThirdTask() {
-        ViewBag.ModalTypeId = ModalType.ModalTypeId;
+        ViewBag.ModalTypeId = HttpContext.Session.Get<ModalType>(ModalType).ModalTypeId;
 
         return View();
     }
@@ -161,38 +164,61 @@ public class TestController : Controller {
     }
 
     public IActionResult ClarifyingQuestionsSaveResult(int age, string clarifyingQuestionOne, string clarifyingQuestionTwo, string clarifyingQuestionThree) {
-        UserAge = age;
-        ClarifyingQuestionOne = clarifyingQuestionOne;
-        ClarifyingQuestionTwo = clarifyingQuestionTwo;
-        ClarifyingQuestionThree = clarifyingQuestionThree;
+        HttpContext.Session.Set<int>(UserAge, age);
+        HttpContext.Session.Set<string>(ClarifyingQuestionOne, clarifyingQuestionOne);
+        HttpContext.Session.Set<string>(ClarifyingQuestionTwo, clarifyingQuestionTwo);
+        HttpContext.Session.Set<string>(ClarifyingQuestionThree, clarifyingQuestionThree);
         return RedirectToAction("TestResult");
     }
 
     public async Task<IActionResult> TestResult() {
-        if (string.IsNullOrEmpty(WordTestResult) || ModalTestResultDictionary == null!) {
-            _logger.LogInformation("Word test result: {WordTestResult}; Modal test dictionary: {ModalTestResultDictionary}", WordTestResult, ModalTestResultDictionary);
-            return RedirectToAction("Index");
+
+        try
+        {
+            var wordTestResult = HttpContext.Session.Get<string>(WordTestResult);
+
+            if (string.IsNullOrEmpty(wordTestResult))
+            {
+                LogWriter.Write("Redirect to Index");
+                return RedirectToAction("Index");
+            }
+
+            var personality = await _personalityRepository.GetPersonalityByTitle(wordTestResult);
+
+            var user = new User
+            {
+                Age = HttpContext.Session.Get<int>(UserAge),
+                PersonalityId = personality.PersonalityId,
+                TestId = 2,
+                ModalTypeId = HttpContext.Session.Get<ModalType>(ModalType)!.ModalTypeId,
+                UserCreateDate = _dateTimeProvider.DateTimeNow,
+                TestTimeResult = stopWatchTestTimeDictionary[HttpContext.Session.Id].Elapsed,
+                ClarifyingQuestionOne = HttpContext.Session.Get<string>(ClarifyingQuestionOne)!,
+                ClarifyingQuestionTwo = HttpContext.Session.Get<string>(ClarifyingQuestionTwo)!,
+                ClarifyingQuestionThree = HttpContext.Session.Get<string>(ClarifyingQuestionThree)
+            };
+
+            var dict =
+                new Dictionary<int, (TimeSpan modalTime, TimeSpan? testTime, bool modalResult, bool? testResult)>();
+            for (int i = 1; i <= 3; i++)
+            {
+                dict[i] = HttpContext.Session
+                    .Get<(TimeSpan modalTime, TimeSpan? testTime, bool modalResult, bool? testResult)>
+                        ($"{ModalTestResult}{i}");
+            }
+
+            await _userService.SaveUserResultInDb(user, dict);
+
+            // Очищать сессию
+            HttpContext.Session.Clear();
+
+            return View(personality.ToDto());
+        }
+        catch (Exception ex)
+        {
+            LogWriter.Write("Error in creating test results; " + ex.Message + "; " + ex.StackTrace);
         }
 
-        var personality = await _personalityRepository.GetPersonalityByTitle(WordTestResult);
-
-        var user = new User {
-            Age = UserAge,
-            PersonalityId = personality.PersonalityId,
-            TestId = CurrentTest.TestId,
-            ModalTypeId = ModalType.ModalTypeId,
-            UserCreateDate = _dateTimeProvider.DateTimeNow,
-            TestTimeResult = TestTimeTimer.Elapsed,
-            ClarifyingQuestionOne = ClarifyingQuestionOne,
-            ClarifyingQuestionTwo = ClarifyingQuestionTwo,
-            ClarifyingQuestionThree = ClarifyingQuestionThree
-        };
-
-        await _userService.SaveUserResultInDb(user, ModalTestResultDictionary);
-
-        ModalTestResultDictionary = null!;
-        WordTestResult = string.Empty;
-
-        return View(personality.ToDto());
+        throw new ArgumentException();
     }
 }

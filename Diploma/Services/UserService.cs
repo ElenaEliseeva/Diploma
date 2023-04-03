@@ -1,4 +1,5 @@
 ﻿using Diploma.DataAccess;
+using Diploma.Helpers;
 using Diploma.Models;
 
 namespace Diploma.Services;
@@ -6,20 +7,16 @@ namespace Diploma.Services;
 public class UserService : IUserService
 {
     private readonly DiplomDbContext _dbContext;
-    private readonly ILogger<UserService> _logger;
 
-    public UserService(DiplomDbContext dbContext, ILogger<UserService> logger)
+    public UserService(DiplomDbContext dbContext)
     {
         _dbContext = dbContext;
-        _logger = logger;
     }
 
     public async Task SaveUserResultInDb(User user, Dictionary<int, (TimeSpan, TimeSpan?, bool, bool?)> modalTestResults)
     {
         try
         {
-            await _dbContext.Database.BeginTransactionAsync();
-
             var counter = 1;
             foreach (var modalValue in modalTestResults)
             {
@@ -27,9 +24,9 @@ public class UserService : IUserService
                 {
                     TestNumber = counter,
                     ModalTimeResult = modalValue.Value.Item1,
-                    TestTimeResult = (TimeSpan)modalValue.Value.Item2,
+                    TestTimeResult = modalValue.Value.Item2,
                     ModalResult = modalValue.Value.Item3,
-                    TestResultt = (bool)modalValue.Value.Item4,
+                    TestResultt = modalValue.Value.Item4,
                     UserId = user.UserId
                 };
 
@@ -39,13 +36,12 @@ public class UserService : IUserService
             }
 
             await _dbContext.AddAsync(user);
-
             await _dbContext.SaveChangesAsync();
-            await _dbContext.Database.CommitTransactionAsync();
+            LogWriter.Write("Success write! User age: " + user.Age);
         }
         catch (Exception ex)
         {
-            _logger.LogError("{Error}", ex.Message);
+            LogWriter.Write(ex.Message + "; " + ex.StackTrace);
         }
     }
 }
