@@ -6,6 +6,8 @@ using System.Diagnostics;
 using Diploma.Models;
 using Diploma.Services;
 using Diploma.Helpers;
+using System.Collections.ObjectModel;
+using System.Collections.Generic;
 
 namespace Diploma.Controllers;
 
@@ -26,9 +28,9 @@ public class TestController : Controller {
     private const string WordTestResult = "_WordTestResult";
     private const string ModalTestResult = "_ModalTestResult";
 
-    private static Dictionary<string, Stopwatch> stopWatchTestTimeDictionary = new Dictionary<string, Stopwatch>();
-    private static Dictionary<string, Stopwatch> stopWatchModalTimeDictionary = new Dictionary<string, Stopwatch>();
-    private static Dictionary<string, Stopwatch> stopWatchTaskTimeDictionary = new Dictionary<string, Stopwatch>();
+    private static readonly Dictionary<string, Stopwatch> StopWatchTestTimeDictionary = new();
+    private static readonly Dictionary<string, Stopwatch> StopWatchModalTimeDictionary = new();
+    private static readonly Dictionary<string, Stopwatch> StopWatchTaskTimeDictionary = new();
 
 
     public TestController(ILogger<TestController> logger, IQuizRepository quizRepository,
@@ -58,7 +60,7 @@ public class TestController : Controller {
             var testTimeTimeStopwatch = new Stopwatch();
             testTimeTimeStopwatch.Start();
 
-            stopWatchTestTimeDictionary[HttpContext.Session.Id] = testTimeTimeStopwatch;
+            StopWatchTestTimeDictionary[HttpContext.Session.Id] = testTimeTimeStopwatch;
 
 
             Response.Cookies.Append("testtype", "2");
@@ -75,7 +77,7 @@ public class TestController : Controller {
     [HttpPost]
     public IActionResult CreateTestResult([FromForm] QuizDto quizDto)
     {
-        var timer = stopWatchTestTimeDictionary[HttpContext.Session.Id];
+        var timer = StopWatchTestTimeDictionary[HttpContext.Session.Id];
         timer.Stop();
 
         try
@@ -97,7 +99,7 @@ public class TestController : Controller {
 
     public void SaveModalResult(int modalNumber, bool modalResult)
     {
-        var modalTimer = stopWatchModalTimeDictionary[HttpContext.Session.Id];
+        var modalTimer = StopWatchModalTimeDictionary[HttpContext.Session.Id];
         modalTimer.Stop();
 
         HttpContext.Session.Set<(TimeSpan modalTime, TimeSpan? testTime, bool modalResult, bool? testResult)>
@@ -106,7 +108,7 @@ public class TestController : Controller {
         var taskTimer = new Stopwatch();
         taskTimer.Start();
 
-        stopWatchTaskTimeDictionary[HttpContext.Session.Id] = taskTimer;
+        StopWatchTaskTimeDictionary[HttpContext.Session.Id] = taskTimer;
     }
 
     public IActionResult FirstTask() {
@@ -116,7 +118,7 @@ public class TestController : Controller {
 
     public void SaveTaskResult(int testNumber, bool selectedAction)
     {
-        var taskTimer = stopWatchTaskTimeDictionary[HttpContext.Session.Id];
+        var taskTimer = StopWatchTaskTimeDictionary[HttpContext.Session.Id];
         taskTimer.Stop();
 
         var val = HttpContext.Session.Get<(TimeSpan modalTime, TimeSpan? testTime, bool modalResult, bool? testResult)>
@@ -132,7 +134,7 @@ public class TestController : Controller {
         var modalTimer = new Stopwatch();
         modalTimer.Start();
 
-        stopWatchModalTimeDictionary[HttpContext.Session.Id] = modalTimer;
+        StopWatchModalTimeDictionary[HttpContext.Session.Id] = modalTimer;
     }
 
     public IActionResult FirstTaskSaveResult() {
@@ -192,7 +194,7 @@ public class TestController : Controller {
                 TestId = 2,
                 ModalTypeId = HttpContext.Session.Get<ModalType>(ModalType)!.ModalTypeId,
                 UserCreateDate = _dateTimeProvider.DateTimeNow,
-                TestTimeResult = stopWatchTestTimeDictionary[HttpContext.Session.Id].Elapsed,
+                TestTimeResult = StopWatchTestTimeDictionary[HttpContext.Session.Id].Elapsed,
                 ClarifyingQuestionOne = HttpContext.Session.Get<string>(ClarifyingQuestionOne)!,
                 ClarifyingQuestionTwo = HttpContext.Session.Get<string>(ClarifyingQuestionTwo)!,
                 ClarifyingQuestionThree = HttpContext.Session.Get<string>(ClarifyingQuestionThree)
@@ -211,6 +213,9 @@ public class TestController : Controller {
 
             // Очищать сессию
             HttpContext.Session.Clear();
+            StopWatchTestTimeDictionary.Remove(HttpContext.Session.Id);
+            StopWatchModalTimeDictionary.Remove(HttpContext.Session.Id);
+            StopWatchTaskTimeDictionary.Remove(HttpContext.Session.Id);
 
             return View(personality.ToDto());
         }

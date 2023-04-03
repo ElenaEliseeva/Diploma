@@ -1,4 +1,3 @@
-using Diploma;
 using Diploma.DataAccess;
 using Diploma.Repository;
 using Diploma.Services;
@@ -23,12 +22,6 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<DiplomDbContext>();
-    DatabaseSeed.SetupTestData(dbContext);
-}
 
 app.UseRouting();
 
